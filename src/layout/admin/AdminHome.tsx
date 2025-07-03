@@ -8,12 +8,12 @@ import {formatDate, formatDateTime} from "../../api/Public-Api";
 function AdminHome() {
     const [users, setUsers] = useState<User[]>([])
     useEffect(() => {
-        getAllUsers().then((data) => {
+        getAllUsers('staff').then((data) => {
             setUsers(data);
         }).catch((error) => {
             console.log(error)
         })
-    })
+    },[])
     return (
         <div className={'admin-home-area'}>
             <Navbar/>
@@ -23,7 +23,7 @@ function AdminHome() {
                 </div>
                 <div className="admin-home-middle">
                     <div className="admin-home-middle-header">
-                        DANH SÁCH KHÁCH HÀNG
+                        DANH SÁCH NHÂN VIÊN
                     </div>
                     <table className="table table-bordered">
                         <thead>

@@ -1,8 +1,13 @@
 import User from "../model/User";
 import {myRequest, myRequestToken} from "./Public-Api";
 
-export async function getAllUsers(): Promise<User[]> {
-    const url = `http://localhost:8082/admin-api/getAllUser`;
+export async function getAllUsers(type: string): Promise<User[]> {
+    let url : string = ``;
+    if (type === 'user') {
+       url = `http://localhost:8082/admin-api/getAllUser`;
+    } else if (type === 'staff') {
+        url = `http://localhost:8082/admin-api/getAllStaff`;
+    }
     const token = localStorage.getItem("token");
 
 

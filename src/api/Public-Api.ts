@@ -58,3 +58,9 @@ export const formatDateTime = (date:string) => {
         year: 'numeric',
     });
 };
+
+export const isTokenExpired = () => {
+    const expiration = localStorage.getItem('expirationTime');
+    if (!expiration) return true; // Nếu không tìm thấy, coi như hết hạn
+    return Date.now() > parseInt(expiration);
+};

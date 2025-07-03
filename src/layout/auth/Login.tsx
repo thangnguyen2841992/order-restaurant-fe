@@ -53,7 +53,9 @@ function Login() {
                 );
                 if (response.ok) {
                     const data = await response.json();
+                    const expirationTime : number = Date.now() + Number.parseInt(data.expirationTime);
                     localStorage.setItem('token', data.token);
+                    localStorage.setItem('expirationTime', String(expirationTime))
                     if (getUserToken().isAdmin){
                         setRole("admin");
                         navigate('/admin/home')
@@ -84,7 +86,7 @@ function Login() {
     }
     return (
         <div className={'login-screen-area'}>
-            <Navbar/>
+            {/*<Navbar/>*/}
             <div className="login-area">
                 <div className="login-area-content">
                     <div className="login-area-content-title">
