@@ -56,6 +56,7 @@ function Login() {
                     localStorage.setItem('token', data.token);
                     if (getUserToken().isAdmin){
                         setRole("admin");
+                        navigate('/admin/home')
                     } else if (getUserToken().isStaff) {
                         setRole("staff");
                     }

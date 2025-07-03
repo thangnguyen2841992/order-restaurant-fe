@@ -11,7 +11,7 @@ function Register() {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [address, setAddress] = useState('');
-    const [birthDay, setBirthDay] = useState('');
+    const [birthDay, setBirthDay] = useState(new Date().toISOString().split('T')[0]);
     const [gender, setGender] = useState(0);
     const [isCheckedPolicy, setIsCheckedPolicy] = useState<boolean>(false);
     const navigate = useNavigate();

@@ -5,6 +5,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import ActiveCode from "./layout/auth/ActiveCode";
 import Register from "./layout/auth/Register";
 import Login from "./layout/auth/Login";
+import AdminHome from "./layout/admin/AdminHome";
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
                   <Route path = "/active/:userId/:activeCode" element={<ActiveCode/>}></Route>
                   <Route path = "/register" element={<Register/>}></Route>
                   <Route path = "/login" element={<Login/>}></Route>
+                  <Route path = "/admin/home" element={<AdminHome/>}></Route>
               </Routes>
           </BrowserRouter>
       </div>
