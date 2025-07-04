@@ -11,14 +11,19 @@ interface NavbarInterface {
 const Navbar: React.FC<NavbarInterface> = () => {
     const navigate = useNavigate();
     useEffect(() => {
-        if (isTokenExpired()) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('expirationTime');
-            alert('Phiên đăng nhập đã kết thúc. Hãy đăng nhập lại.')
-            navigate('/login');
-        }
+        const interval = setInterval(() => {
+            if (isTokenExpired()) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('expirationTime');
+                alert('Phiên đăng nhập đã kết thúc. Hãy đăng nhập lại.')
+                navigate('/login');
+            }
+        }, 60000); // Gọi mỗi 1000 ms (1 giây)
 
-    },[])
+        // Dọn dẹp khi component unmount
+        return () => clearInterval(interval);
+    }, []); // Chỉ chạy khi component mount
+
     return (
         <div className={'navbar-area'}>
             <div className="navbar-area-logo">
