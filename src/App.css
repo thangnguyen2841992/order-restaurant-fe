@@ -146,3 +146,32 @@ td {
   top : 35px;
   cursor: pointer;
 }
+.image-product-item {
+  color: #0000EE;
+  cursor: pointer;
+}
+.image-product-item:hover{
+  text-decoration: underline;
+}
+.previous-image, .next-image {
+  position: absolute;
+  top: 45%;
+  border: none;
+  outline: none;
+  background-color: #FF0000FF;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.previous-image {
+  left: -5px;
+}
+.next-image {
+  right: 5px;
+}
+.post-detail-image-item-one img {
+  width: 100%;
+}

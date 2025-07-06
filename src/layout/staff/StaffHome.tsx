@@ -3,6 +3,7 @@ import NavStaff from "./NavStaff";
 import Navbar from "../shared/Navbar";
 import Product from "../../model/Product";
 import {getAllProducts} from "../../api/Staff-Api";
+import ImageProduct from "./ImageProduct";
 
 function StaffHome() {
     const [menuStaff, setMenuStaff] = useState<string>('listProduct')
@@ -49,9 +50,9 @@ function StaffHome() {
                                     <th scope="row">{index + 1}</th>
                                     <td>{product.productName}</td>
                                     <td>{product.brand?.brandName}</td>
-                                    <td>{product.productPrice + ' / ' + product.productUnit?.productUnitName}</td>
+                                    <td>{product.productPrice} <u>đ</u>  /   {product.productUnit?.productUnitName}</td>
                                     <td>{product.point}</td>
-                                    <td>Ảnh</td>
+                                    <td><ImageProduct productId={product.productId ? product.productId : 0}/></td>
                                     {/*<td>{formatDate(user.birthday === undefined ? "" : user.birthday)}</td>*/}
                                     {/*<td><img src={product.} alt=""/></td>*/}
                                 </tr>
