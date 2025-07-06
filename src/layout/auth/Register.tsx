@@ -1,6 +1,8 @@
 import Navbar from "../shared/Navbar";
 import React, {ChangeEvent, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 
 function Register() {
     const [firstName, setFirstName] = useState('');
@@ -15,6 +17,10 @@ function Register() {
     const [gender, setGender] = useState(0);
     const [isCheckedPolicy, setIsCheckedPolicy] = useState<boolean>(false);
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+    const handleShowPassword = () => {
+        setShowPassword(!showPassword);
+    }
 
     const redirectLogin = () => {
         navigate('/login');
@@ -113,7 +119,6 @@ function Register() {
 
     return (
         <div className={'register-screen-area'}>
-            <Navbar/>
             <div className="register-area">
                 <div className="register-area-content">
                     <div className="register-area-content-title">
@@ -158,18 +163,30 @@ function Register() {
                         </div>
 
                         <div className={'form-password-area'}>
-                            <div className="form-group">
+                            <div className="form-group" style={{position: 'relative'}}>
                                 <label htmlFor="password">Mật Khẩu <small style={{color: 'red'}}>*</small></label>
-                                <input value={password} onChange={handleChangePassword} required type="password"
+                                <input value={password} onChange={handleChangePassword} required type={showPassword ? 'text' : 'password'}
                                        className="form-control" id="password"
                                        placeholder="Password"/>
+                                <div onClick={handleShowPassword} title='Ẩn mật khẩu'  hidden={!showPassword} className={'hidden-password-button'}>
+                                    <FontAwesomeIcon  icon={faEyeSlash}/>
+                                </div>
+                                <div onClick={handleShowPassword} title={'Hiển thị mật khẩu'}  hidden={showPassword} className={'show-password-button'}>
+                                    <FontAwesomeIcon icon={faEye}/>
+                                </div>
                             </div>
-                            <div className="form-group" style={{marginLeft: '30px'}}>
+                            <div className="form-group" style={{marginLeft: '30px', position: 'relative'}}>
                                 <label htmlFor="confirmPassword">Xác Nhận Mật Khẩu <small
                                     style={{color: 'red'}}>*</small></label>
                                 <input value={confirmPassword} onChange={handleChangeConfirmPassword} required
-                                       type="password" className="form-control" id="confirmPassword"
+                                       type={showPassword ? 'text' : 'password'} className="form-control" id="confirmPassword"
                                        placeholder="Password"/>
+                                <div onClick={handleShowPassword} title='Ẩn mật khẩu'  hidden={!showPassword} className={'hidden-password-button'}>
+                                    <FontAwesomeIcon  icon={faEyeSlash}/>
+                                </div>
+                                <div onClick={handleShowPassword} title={'Hiển thị mật khẩu'}  hidden={showPassword} className={'show-password-button'}>
+                                    <FontAwesomeIcon icon={faEye}/>
+                                </div>
                             </div>
                         </div>
                         <div className={'form-birthday-gender'}>

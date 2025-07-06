@@ -2,12 +2,19 @@ import Navbar from "../shared/Navbar";
 import React, {ChangeEvent, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {getUserToken} from "../../api/Public-Api";
+import {faEye, faEyeSlash, faShoppingCart} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState('user');
     const navigate = useNavigate();
+
+    const handleShowPassword = () => {
+      setShowPassword(!showPassword);
+    }
 
     const handleChangeUsername = (e: ChangeEvent<HTMLInputElement>) => {
         setUsername(e.target.value);
@@ -58,9 +65,10 @@ function Login() {
                     localStorage.setItem('expirationTime', String(expirationTime))
                     if (getUserToken().isAdmin){
                         setRole("admin");
-                        navigate('/admin/home')
+                        navigate('/admin/home');
                     } else if (getUserToken().isStaff) {
                         setRole("staff");
+                        navigate('/staff/home');
                     }
                     alert("Đăng nhập thành công");
                     console.log(role);
@@ -99,11 +107,17 @@ function Login() {
                                    className="form-control" id="email"
                                    aria-describedby="emailHelp" placeholder="Tên Tài Khoản"/>
                         </div>
-                        <div className="form-group">
+                        <div className="form-group" style={{position:'relative'}}>
                             <label htmlFor="password">Mật Khẩu <small style={{color: 'red'}}>*</small></label>
-                            <input onKeyDown={handleOnKeyDown} value={password} onChange={handleChangePassword} required type="password"
+                            <input  onKeyDown={handleOnKeyDown} value={password} onChange={handleChangePassword} required type={showPassword ? 'text' : 'password'}
                                    className="form-control" id="password"
                                    aria-describedby="emailHelp" placeholder="Mật Khẩu"/>
+                            <div onClick={handleShowPassword} title='Ẩn mật khẩu'  hidden={!showPassword} className={'hidden-password-button'}>
+                                <FontAwesomeIcon  icon={faEyeSlash}/>
+                            </div>
+                            <div onClick={handleShowPassword} title={'Hiển thị mật khẩu'}  hidden={showPassword} className={'show-password-button'}>
+                                <FontAwesomeIcon icon={faEye}/>
+                            </div>
                         </div>
                         <label className="form-check-label" style={{
                             display: 'flex',
