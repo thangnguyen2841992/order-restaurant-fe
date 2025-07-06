@@ -4,12 +4,29 @@ import Navbar from "../shared/Navbar";
 import Product from "../../model/Product";
 import {getAllProducts} from "../../api/Staff-Api";
 import ImageProduct from "./ImageProduct";
+import ModalCreateNewProduct from "./ModalCreateNewProduct";
+import product from "../../model/Product";
 
 function StaffHome() {
     const [menuStaff, setMenuStaff] = useState<string>('listProduct')
     const handleChangeMenuStaff = (value: string) => {
         setMenuStaff(value);
     };
+    const [showModalCreatePopup, setShowModalCreatePopup]= useState(false);
+    const [resetModalCreatePopup, setResetPropProduct]= useState(false);
+    const [type, setType]= useState('C');
+    const [productId, setProductId]= useState(0);
+
+    const handleShowModalCreatePopup = () => {
+        setShowModalCreatePopup(true);
+        setType('C');
+        setProductId(0);
+    };
+
+    const handleCloseModalCreatePopup = () => {
+        setShowModalCreatePopup(false);
+        setResetPropProduct(true);
+    }
 
     const [products, setProducts] = useState<Product[]>([]);
 
@@ -30,7 +47,9 @@ function StaffHome() {
                 <div hidden={menuStaff !== 'listProduct'}  className="staff-home-middle-list">
                     <div className="staff-home-middle-header">
                         DANH SÁCH SẢN PHẨM
+                        <button onClick={handleShowModalCreatePopup} className={'btn btn-primary'}>Thêm mới sản phẩm</button>
                     </div>
+
                     <table className="table table-bordered">
                         <thead>
                         <tr>
@@ -65,6 +84,13 @@ function StaffHome() {
             </div>
             <div className="staff-home-right"></div>
             </div>
+            <ModalCreateNewProduct
+                show={showModalCreatePopup}
+                type={type}
+                productId={productId}
+                onHide={handleCloseModalCreatePopup}
+                resetPropModalCreatePopup={resetModalCreatePopup}
+            />
         </div>
     )
 }
