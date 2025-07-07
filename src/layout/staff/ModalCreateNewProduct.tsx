@@ -6,7 +6,8 @@ import ProductUnit from "../../model/ProductUnit";
 import {getAllProductUnits} from "../../api/Product-Unit-Api";
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {imageDb} from "../../firebase/ConfigFireBase";
-import Image from "../../model/Image";
+import {getProductByProductId} from "../../api/Staff-Api";
+import Waiting from "./Waiting";
 
 
 function ModalCreateNewProduct(props: any) {
@@ -55,8 +56,9 @@ function ModalCreateNewProduct(props: any) {
     const handleChangeProductUnitId = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setProductUnitId(event.target.value);
     };
-
+    const [processImg, setProcessImg] = useState(false);
     const onImagesInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        setProcessImg(true);
         const uploadedUrls: string[] = [];
         // @ts-ignore
         const files = event.target.files;
@@ -74,6 +76,7 @@ function ModalCreateNewProduct(props: any) {
             }
             setImageListData(uploadedUrls);
         }
+        setProcessImg(false);
     }
 
     const handleSaveProduct = async () => {
@@ -124,13 +127,23 @@ function ModalCreateNewProduct(props: any) {
             console.log(error);
         });
         if (Number(props.productId) !== 0) {
-
+            getProductByProductId(Number(props.productId)).then((data) => {
+                setProductName(data.productName ? data.productName : '');
+                setProductDescription(data.description ? data.description : '');
+                setProductQuantity(data.quantity ? data.quantity.toString() : '0');
+                setProductPrice(data.productPrice ? data.productPrice.toString() : '1000');
+                setProductPoint(data.point ? data.point.toString() : '0');
+                setProductUnitId(data.productUnit?.productUnitId ? data.productUnit.productUnitId.toString() : '1');
+                setBrandId(data.brand?.brandId ? data.brand.brandId.toString() : '1')
+            }).catch((error) => {
+                console.log(error);
+            })
         }
     }, [props.productId]);
     return (
         <div className={'product-create-detail-area'}>
             <Modal
-                {...props}
+                   {...props}
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
@@ -142,7 +155,7 @@ function ModalCreateNewProduct(props: any) {
                     </Modal.Title>
                 </Modal.Header>
 
-                <div>
+                <div style={ processImg ?{pointerEvents : 'none'} : {pointerEvents : 'auto'}}>
                     <Modal.Body>
                         <div className="form-group">
                             <label htmlFor="brand">Danh mục sản phẩm<small>*</small></label>
@@ -205,6 +218,7 @@ function ModalCreateNewProduct(props: any) {
                             <input required type="file" multiple
                                    className="form-control" id="imageProduct" onChange={onImagesInputChange}/>
                         </div>
+                        <Waiting isDone={processImg}/>
                         <button onClick={handleSaveProduct} style={{width: '100%'}} className={'btn btn-primary'}>Lưu
                             sản phẩm
                         </button>
