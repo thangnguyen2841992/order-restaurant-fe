@@ -13,7 +13,7 @@ function StaffHome() {
     };
     const handleChangeBrandIdSelect = (value: string) => {
         if (Number(value) !== 0) {
-            getAllProductsOfBrand(Number(value)).then((data)=> {
+            getAllProductsOfBrand(Number(value)).then((data) => {
                 setProducts(data);
             }).catch((error) => {
                 console.log(error);
@@ -26,15 +26,15 @@ function StaffHome() {
             })
         }
     };
-    const [showModalCreatePopup, setShowModalCreatePopup]= useState(false);
-    const [resetModalCreatePopup, setResetPropProduct]= useState(false);
-    const [type, setType]= useState('C');
-    const [productId, setProductId]= useState(0);
+    const [showModalCreatePopup, setShowModalCreatePopup] = useState(false);
+    const [resetModalCreatePopup, setResetPropProduct] = useState(false);
+    const [type, setType] = useState('C');
+    const [productId, setProductId] = useState(0);
 
-    const handleShowModalCreatePopup = () => {
+    const handleShowModalCreatePopup = (productId: number) => {
         setShowModalCreatePopup(true);
         setType('C');
-        setProductId(0);
+        setProductId(productId);
     };
     const getAllProduct = () => {
         getAllProducts().then((data) => {
@@ -57,51 +57,67 @@ function StaffHome() {
     return (
         <div className={'staff-home-area'}>
             <Navbar/>
-            <NavStaff handleChangeMenuStaff={handleChangeMenuStaff} handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
+            <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
+                      handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
             <div className="staff-home-content">
-            <div className="staff-home-left"></div>
-            <div className="staff-home-middle">
-                <div hidden={menuStaff !== 'listProduct'}  className="staff-home-middle-list">
-                    <div className="staff-home-middle-header">
-                        DANH SÁCH SẢN PHẨM
-                        <button onClick={handleShowModalCreatePopup} className={'btn btn-primary'}>Thêm mới sản phẩm</button>
+                <div className="staff-home-left"></div>
+                <div className="staff-home-middle">
+                    <div hidden={menuStaff !== 'listProduct'} className="staff-home-middle-list">
+                        <div className="staff-home-middle-header">
+                            DANH SÁCH SẢN PHẨM
+                            <button onClick={() => handleShowModalCreatePopup(0)} className={'btn btn-primary'}>Thêm mới
+                                sản phẩm</button>
+                        </div>
+
+                        <table className="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th scope="col">STT</th>
+                                <th scope="col">Tên Sản Phẩm</th>
+                                <th scope="col">Danh Mục Sản Phẩm</th>
+                                <th scope="col">Giá (VNĐ)</th>
+                                <th scope="col">Số lượng</th>
+                                <th scope="col">Điểm Tích Lũy</th>
+                                <th scope="col">Mô tả sản phẩm</th>
+                                <th scope="col">Ảnh Sản Phẩm</th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {
+                                products.length > 0 ? (products.map((product, index) => (
+                                    <tr>
+                                        <th scope="row">{index + 1}</th>
+                                        <td onClick={() => product.productId && handleShowModalCreatePopup(product.productId)}
+                                            id={'td-product-name'}
+                                            style={{color: 'blue', cursor: 'pointer'}}>{product.productName}</td>
+                                        <td>{product.brand?.brandName}</td>
+                                        <td>{product.productPrice?.toLocaleString()}
+                                            <u>đ</u> / {product.productUnit?.productUnitName}</td>
+                                        <td>{product.quantity}</td>
+                                        <td>{product.point}</td>
+                                        <td>{product.description}</td>
+                                        <td><ImageProduct productId={product.productId ? product.productId : 0}/></td>
+                                    </tr>
+                                ))) : (
+                                    <tr>
+                                        <td style={{
+                                            height: '300px',
+                                            textAlign: 'center',
+                                            verticalAlign: 'middle',
+                                            fontSize: '18px',
+                                            fontWeight: '500'
+                                        }} colSpan={8}>Không có sản phẩm nào
+                                        </td>
+                                    </tr>
+                                )
+                            }
+                            </tbody>
+                        </table>
                     </div>
 
-                    <table className="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th scope="col">STT</th>
-                            <th scope="col">Tên Sản Phẩm</th>
-                            <th scope="col">Danh Mục Sản Phẩm</th>
-                            <th scope="col">Giá (VNĐ)</th>
-                            <th scope="col">Số lượng</th>
-                            <th scope="col">Điểm Tích Lũy</th>
-                            <th scope="col">Mô tả sản phẩm</th>
-                            <th scope="col">Ảnh Sản Phẩm</th>
-
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            products.map((product, index) => (
-                                <tr>
-                                    <th scope="row">{index + 1}</th>
-                                    <td>{product.productName}</td>
-                                    <td>{product.brand?.brandName}</td>
-                                    <td>{product.productPrice?.toLocaleString()} <u>đ</u>  /   {product.productUnit?.productUnitName}</td>
-                                    <td>{product.quantity}</td>
-                                    <td>{product.point}</td>
-                                    <td>{product.description}</td>
-                                    <td><ImageProduct productId={product.productId ? product.productId : 0}/></td>
-                                </tr>
-                            ))
-                        }
-                        </tbody>
-                    </table>
                 </div>
-
-            </div>
-            <div className="staff-home-right"></div>
+                <div className="staff-home-right"></div>
             </div>
             <ModalCreateNewProduct
                 show={showModalCreatePopup}
@@ -114,4 +130,5 @@ function StaffHome() {
         </div>
     )
 }
+
 export default StaffHome

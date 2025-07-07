@@ -123,7 +123,10 @@ function ModalCreateNewProduct(props: any) {
         }).catch((error) => {
             console.log(error);
         });
-    }, []);
+        if (Number(props.productId) !== 0) {
+
+        }
+    }, [props.productId]);
     return (
         <div className={'product-create-detail-area'}>
             <Modal

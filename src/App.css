@@ -262,3 +262,6 @@ td {
     border-radius: 10px;
     cursor: pointer;
 }
+#td-product-name:hover {
+    text-decoration: underline;
+}
