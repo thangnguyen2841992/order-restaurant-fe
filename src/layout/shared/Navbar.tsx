@@ -1,8 +1,9 @@
 import React, {useEffect} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faHeart, faSearch, faShoppingCart, faUser} from "@fortawesome/free-solid-svg-icons";
-import {isTokenExpired} from "../../api/Public-Api";
+import {faHeart, faSearch, faShoppingCart} from "@fortawesome/free-solid-svg-icons";
+import {getUserToken, isTokenExpired} from "../../api/Public-Api";
 import {useNavigate} from "react-router-dom";
+import {Dropdown} from "react-bootstrap";
 
 interface NavbarInterface {
 
@@ -10,13 +11,18 @@ interface NavbarInterface {
 
 const Navbar: React.FC<NavbarInterface> = () => {
     const navigate = useNavigate();
+    const fullName = getUserToken().fullName;
+
+    const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('expirationTime');
+        navigate('/login');
+    }
     useEffect(() => {
         const interval = setInterval(() => {
             if (isTokenExpired()) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('expirationTime');
+                logout();
                 alert('Phiên đăng nhập đã kết thúc. Hãy đăng nhập lại.')
-                navigate('/login');
             }
         }, 60000); // Gọi mỗi 1000 ms (1 giây)
 
@@ -36,20 +42,21 @@ const Navbar: React.FC<NavbarInterface> = () => {
                 </button>
             </div>
             <div className={'navbar-area-action'}>
-                <button>
-                    <FontAwesomeIcon icon={faHeart}/>
-                    <div>Yêu Thích</div>
-                </button>
+                    <button title={'Yêu Thích'}>
+                        <FontAwesomeIcon icon={faHeart}/>
+                    </button>
 
-                <button>
-                    <FontAwesomeIcon icon={faUser}/>
-                    <div>Tài Khoản</div>
-                </button>
-
-                <button>
-                    <FontAwesomeIcon icon={faShoppingCart}/>
-                    <div>Giỏ Hàng</div>
-                </button>
+                    <button title={'Giỏ Hàng'}>
+                        <FontAwesomeIcon icon={faShoppingCart}/>
+                    </button>
+                <Dropdown >
+                    <Dropdown.Toggle variant="success" id="dropdown-basic">
+                           Xin chào: {fullName}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        <Dropdown.Item onClick={logout} eventKey="Option 1">Đăng xuất</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
             </div>
         </div>
     )

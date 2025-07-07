@@ -2,15 +2,29 @@ import React, {useEffect, useState} from "react";
 import NavStaff from "./NavStaff";
 import Navbar from "../shared/Navbar";
 import Product from "../../model/Product";
-import {getAllProducts} from "../../api/Staff-Api";
+import {getAllProducts, getAllProductsOfBrand} from "../../api/Staff-Api";
 import ImageProduct from "./ImageProduct";
 import ModalCreateNewProduct from "./ModalCreateNewProduct";
-import product from "../../model/Product";
 
 function StaffHome() {
     const [menuStaff, setMenuStaff] = useState<string>('listProduct')
     const handleChangeMenuStaff = (value: string) => {
         setMenuStaff(value);
+    };
+    const handleChangeBrandIdSelect = (value: string) => {
+        if (Number(value) !== 0) {
+            getAllProductsOfBrand(Number(value)).then((data)=> {
+                setProducts(data);
+            }).catch((error) => {
+                console.log(error);
+            })
+        } else {
+            getAllProducts().then((data) => {
+                setProducts(data);
+            }).catch((error) => {
+                console.log(error);
+            })
+        }
     };
     const [showModalCreatePopup, setShowModalCreatePopup]= useState(false);
     const [resetModalCreatePopup, setResetPropProduct]= useState(false);
@@ -22,25 +36,28 @@ function StaffHome() {
         setType('C');
         setProductId(0);
     };
-
-    const handleCloseModalCreatePopup = () => {
-        setShowModalCreatePopup(false);
-        setResetPropProduct(true);
-    }
-
-    const [products, setProducts] = useState<Product[]>([]);
-
-    useEffect(() => {
+    const getAllProduct = () => {
         getAllProducts().then((data) => {
             setProducts(data);
         }).catch((error) => {
             console.log(error);
         })
+    }
+
+    const handleCloseModalCreatePopup = () => {
+        setShowModalCreatePopup(false);
+        setResetPropProduct(true);
+        getAllProduct();
+    }
+
+    const [products, setProducts] = useState<Product[]>([]);
+    useEffect(() => {
+        getAllProduct();
     }, [])
     return (
         <div className={'staff-home-area'}>
             <Navbar/>
-            <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}/>
+            <NavStaff handleChangeMenuStaff={handleChangeMenuStaff} handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
             <div className="staff-home-content">
             <div className="staff-home-left"></div>
             <div className="staff-home-middle">
@@ -57,7 +74,9 @@ function StaffHome() {
                             <th scope="col">Tên Sản Phẩm</th>
                             <th scope="col">Danh Mục Sản Phẩm</th>
                             <th scope="col">Giá (VNĐ)</th>
+                            <th scope="col">Số lượng</th>
                             <th scope="col">Điểm Tích Lũy</th>
+                            <th scope="col">Mô tả sản phẩm</th>
                             <th scope="col">Ảnh Sản Phẩm</th>
 
                         </tr>
@@ -69,11 +88,11 @@ function StaffHome() {
                                     <th scope="row">{index + 1}</th>
                                     <td>{product.productName}</td>
                                     <td>{product.brand?.brandName}</td>
-                                    <td>{product.productPrice} <u>đ</u>  /   {product.productUnit?.productUnitName}</td>
+                                    <td>{product.productPrice?.toLocaleString()} <u>đ</u>  /   {product.productUnit?.productUnitName}</td>
+                                    <td>{product.quantity}</td>
                                     <td>{product.point}</td>
+                                    <td>{product.description}</td>
                                     <td><ImageProduct productId={product.productId ? product.productId : 0}/></td>
-                                    {/*<td>{formatDate(user.birthday === undefined ? "" : user.birthday)}</td>*/}
-                                    {/*<td><img src={product.} alt=""/></td>*/}
                                 </tr>
                             ))
                         }
@@ -90,6 +109,7 @@ function StaffHome() {
                 productId={productId}
                 onHide={handleCloseModalCreatePopup}
                 resetPropModalCreatePopup={resetModalCreatePopup}
+                handleCloseModalCreatePopup={handleCloseModalCreatePopup}
             />
         </div>
     )
