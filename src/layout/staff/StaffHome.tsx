@@ -7,25 +7,16 @@ import ImageProduct from "./ImageProduct";
 import ModalCreateNewProduct from "./ModalCreateNewProduct";
 
 function StaffHome() {
+    const [actionModalCreateUpdate, setActionModalCreateUpdate] = useState(false);
     const [showEditImageForm, setShowEditImageForm] = useState(false);
-    const [menuStaff, setMenuStaff] = useState<string>('listProduct')
+    const [menuStaff, setMenuStaff] = useState<string>('listProduct');
+    const [products, setProducts] = useState<Product[]>([]);
+    const [brandId, setBrandId] = useState(0);
     const handleChangeMenuStaff = (value: string) => {
         setMenuStaff(value);
     };
     const handleChangeBrandIdSelect = (value: string) => {
-        if (Number(value) !== 0) {
-            getAllProductsOfBrand(Number(value)).then((data) => {
-                setProducts(data);
-            }).catch((error) => {
-                console.log(error);
-            })
-        } else {
-            getAllProducts().then((data) => {
-                setProducts(data);
-            }).catch((error) => {
-                console.log(error);
-            })
-        }
+       setBrandId(Number(value));
     };
     const [showModalCreatePopup, setShowModalCreatePopup] = useState(false);
     const [resetModalCreatePopup, setResetPropProduct] = useState(false);
@@ -49,13 +40,24 @@ function StaffHome() {
         setShowModalCreatePopup(false);
         setResetPropProduct(true);
         setShowEditImageForm(false);
-        getAllProduct();
     }
 
-    const [products, setProducts] = useState<Product[]>([]);
     useEffect(() => {
-        getAllProduct();
-    }, [])
+        if (Number(brandId) !== 0) {
+            getAllProductsOfBrand(brandId).then((data) => {
+                setProducts(data);
+            }).catch((error) => {
+                console.log(error);
+            })
+        } else {
+            getAllProducts().then((data) => {
+                setProducts(data);
+            }).catch((error) => {
+                console.log(error);
+            })
+        }
+        setActionModalCreateUpdate(false);
+    }, [brandId, actionModalCreateUpdate])
     return (
         <div className={'staff-home-area'}>
             <Navbar/>
@@ -99,7 +101,7 @@ function StaffHome() {
                                         <td>{product.quantity}</td>
                                         <td>{product.point}</td>
                                         <td>{product.description}</td>
-                                        <td><ImageProduct productId={product.productId ? product.productId : 0}/></td>
+                                        <td><ImageProduct productId={product.productId ? product.productId : 0} actionModalCreateUpdate={actionModalCreateUpdate}/></td>
                                     </tr>
                                 ))) : (
                                     <tr>
@@ -130,6 +132,7 @@ function StaffHome() {
                 handleCloseModalCreatePopup={handleCloseModalCreatePopup}
                 showEditImageForm={showEditImageForm}
                 setShowEditImageForm={setShowEditImageForm}
+                setActionModalCreateUpdate={setActionModalCreateUpdate}
             />
         </div>
     )

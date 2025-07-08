@@ -5,9 +5,10 @@ import ShowImageModal from "./ShowImageModal";
 
 interface ImageProductInterface {
     productId: number;
+    actionModalCreateUpdate : boolean
 }
 
-const ImageProduct: React.FC<ImageProductInterface> = ({productId}) => {
+const ImageProduct: React.FC<ImageProductInterface> = ({productId, actionModalCreateUpdate}) => {
     const [images, setImages] = useState<Image[]>([]);
     const [showImage, setShowImage] = useState<boolean>(false);
     const [resetPropImage, setResetPropImage] = useState(false);
@@ -26,10 +27,10 @@ const ImageProduct: React.FC<ImageProductInterface> = ({productId}) => {
         }).catch((error) => {
             console.log(error);
         })
-    }, [productId]);
+    }, [productId, actionModalCreateUpdate]);
     return (
         <div className={'image-product-area'}>
-            <div onClick={handleShowImage} title={'Hiển thị ảnh'} className={'image-product-item'}>Hiển thị ảnh</div>
+            <div onClick={handleShowImage} title={'Hiển thị ảnh'} className={'image-product-item'}>{images.length > 0 ? 'Hiển thị ảnh' : 'Chưa có ảnh'}</div>
             <ShowImageModal
                 show={showImage}
                 images={images}

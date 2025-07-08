@@ -113,7 +113,7 @@ function ModalCreateNewProduct(props: any) {
                         productUnitId: Number(productUnitId),
                         brandId: Number(brandId),
                         point: Number(productPoint),
-                        imageLinks: imageListData,
+                        imageList: images,
                         description: productDescription.trim(),
                         quantity: productQuantity
                     })
@@ -122,7 +122,7 @@ function ModalCreateNewProduct(props: any) {
 
             if (response.ok) {
                 alert('Thêm mới sản phẩm thành công');
-                resetProductForm();
+                props.setActionModalCreateUpdate(true);
                 props.handleCloseModalCreatePopup();
             } else {
                 console.log(response.json());
@@ -159,7 +159,8 @@ function ModalCreateNewProduct(props: any) {
 
             if (response.ok) {
                 alert('Chỉnh sửa sản phẩm thành công');
-                resetProductForm();
+                // resetProductForm();
+                props.setActionModalCreateUpdate(true);
                 props.handleCloseModalCreatePopup();
             } else {
                 console.log(response.json());
@@ -203,6 +204,8 @@ function ModalCreateNewProduct(props: any) {
             }).catch((error) => {
                 console.log(error);
             })
+        }else {
+            resetProductForm();
         }
     }, [props.productId]);
     return (
@@ -290,9 +293,14 @@ function ModalCreateNewProduct(props: any) {
                                 <input ref={fileInputRef} hidden required type="file" multiple
                                        className="form-control" id="imageProduct" onChange={onImagesInputChange}/>
                                 <button hidden={images.length > 0 || processImg} className={'add-image-button'} onClick={handleButtonClick}>
-                                    <FontAwesomeIcon
-                                        icon={faImages}/>
-                                    Thêm ảnh
+                                    <div className={'add-image-button-name'}>
+                                        Thêm ảnh sản phẩm
+                                    </div>
+                                    <div className={'add-image-button-icon'}>
+                                        <FontAwesomeIcon
+                                            icon={faImages}/>
+                                    </div>
+
                                 </button>
 
                                 <div onClick={showEditImage}
@@ -318,6 +326,7 @@ function ModalCreateNewProduct(props: any) {
                                         </div>
                                     ))
                                 }
+                                <Waiting isDone={processImg}/>
                             </div>
                             <div className="form-group">
                                 <input hidden required type="file" multiple
@@ -327,10 +336,15 @@ function ModalCreateNewProduct(props: any) {
                                        ref={fileInputRef}
                                 />
 
-                                <button style={{marginTop : '20px'}} className={'add-image-button'} onClick={handleButtonClick}>
-                                    <FontAwesomeIcon
-                                        icon={faImages}/>
-                                    Thêm ảnh
+                                <button className={'add-image-button'} onClick={handleButtonClick}>
+                                    <div className={'add-image-button-name'}>
+                                        Thêm ảnh sản phẩm
+                                    </div>
+                                    <div className={'add-image-button-icon'}>
+                                        <FontAwesomeIcon
+                                            icon={faImages}/>
+                                    </div>
+
                                 </button>
                             </div>
                         </div>
