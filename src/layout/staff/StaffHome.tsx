@@ -7,6 +7,7 @@ import ImageProduct from "./ImageProduct";
 import ModalCreateNewProduct from "./ModalCreateNewProduct";
 
 function StaffHome() {
+    const [showEditImageForm, setShowEditImageForm] = useState(false);
     const [menuStaff, setMenuStaff] = useState<string>('listProduct')
     const handleChangeMenuStaff = (value: string) => {
         setMenuStaff(value);
@@ -31,9 +32,9 @@ function StaffHome() {
     const [type, setType] = useState('C');
     const [productId, setProductId] = useState(0);
 
-    const handleShowModalCreatePopup = (productId: number) => {
+    const handleShowModalCreatePopup = (productId: number, type :string) => {
         setShowModalCreatePopup(true);
-        setType('C');
+        setType(type);
         setProductId(productId);
     };
     const getAllProduct = () => {
@@ -47,6 +48,7 @@ function StaffHome() {
     const handleCloseModalCreatePopup = () => {
         setShowModalCreatePopup(false);
         setResetPropProduct(true);
+        setShowEditImageForm(false);
         getAllProduct();
     }
 
@@ -65,7 +67,7 @@ function StaffHome() {
                     <div hidden={menuStaff !== 'listProduct'} className="staff-home-middle-list">
                         <div className="staff-home-middle-header">
                             DANH SÁCH SẢN PHẨM
-                            <button onClick={() => handleShowModalCreatePopup(0)} className={'btn btn-primary'}>Thêm mới
+                            <button onClick={() => handleShowModalCreatePopup(0, 'C')} className={'btn btn-primary'}>Thêm mới
                                 sản phẩm</button>
                         </div>
 
@@ -88,7 +90,7 @@ function StaffHome() {
                                 products.length > 0 ? (products.map((product, index) => (
                                     <tr>
                                         <th scope="row">{index + 1}</th>
-                                        <td onClick={() => product.productId && handleShowModalCreatePopup(product.productId)}
+                                        <td onClick={() => product.productId && handleShowModalCreatePopup(product.productId, 'U')}
                                             id={'td-product-name'}
                                             style={{color: 'blue', cursor: 'pointer'}}>{product.productName}</td>
                                         <td>{product.brand?.brandName}</td>
@@ -126,6 +128,8 @@ function StaffHome() {
                 onHide={handleCloseModalCreatePopup}
                 resetPropModalCreatePopup={resetModalCreatePopup}
                 handleCloseModalCreatePopup={handleCloseModalCreatePopup}
+                showEditImageForm={showEditImageForm}
+                setShowEditImageForm={setShowEditImageForm}
             />
         </div>
     )

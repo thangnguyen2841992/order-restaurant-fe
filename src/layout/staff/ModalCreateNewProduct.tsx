@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Modal} from "react-bootstrap";
 import Brand from "../../model/Brand";
 import {getAllBrands} from "../../api/Brand-Api";
@@ -8,6 +8,10 @@ import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {imageDb} from "../../firebase/ConfigFireBase";
 import {getProductByProductId} from "../../api/Staff-Api";
 import Waiting from "./Waiting";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faArrowLeft, faImages, faTimes} from "@fortawesome/free-solid-svg-icons";
+import Image from "../../model/Image";
+import {getAllImagesOfProductId} from "../../api/Image-Api";
 
 
 function ModalCreateNewProduct(props: any) {
@@ -21,16 +25,19 @@ function ModalCreateNewProduct(props: any) {
     const [productPoint, setProductPoint] = useState('0');
     const [brands, setBrands] = useState<Brand[]>([]);
     const [productUnits, setProductUnits] = useState<ProductUnit[]>([]);
+    const token = localStorage.getItem('token');
+    const [images, setImages] = useState<Image[]>([]);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const resetProductForm = () => {
-      setProductName('');
-      setProductDescription('');
-      setProductQuantity('0');
-      setProductPrice('1000');
-      setProductPoint('0');
-      setImageListData([]);
-      setProductUnitId('1');
-      setBrandId('1')
+        setProductName('');
+        setProductDescription('');
+        setProductQuantity('0');
+        setProductPrice('1000');
+        setProductPoint('0');
+        setImageListData([]);
+        setProductUnitId('1');
+        setBrandId('1')
     }
 
     const handleChangeProductName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +63,14 @@ function ModalCreateNewProduct(props: any) {
     const handleChangeProductUnitId = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setProductUnitId(event.target.value);
     };
+
+    const showEditImage = () => {
+        props.setShowEditImageForm(true);
+    }
+
+    const deleteImage = (imageIndex: number) => {
+        setImages(prevImages => prevImages.filter((_, index) => index !== imageIndex));
+    }
     const [processImg, setProcessImg] = useState(false);
     const onImagesInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         setProcessImg(true);
@@ -74,7 +89,11 @@ function ModalCreateNewProduct(props: any) {
                     console.error('Error uploading file:', error);
                 }
             }
-            setImageListData(uploadedUrls);
+
+            const newImages = uploadedUrls.map((link) => ({
+                imageLink: link,
+            }));
+            setImages(prevImages => [...prevImages, ...newImages]);
         }
         setProcessImg(false);
     }
@@ -82,7 +101,6 @@ function ModalCreateNewProduct(props: any) {
     const handleSaveProduct = async () => {
         try {
             const url: string = `http://localhost:8083/staff-api/createNewProduct`;
-            const token = localStorage.getItem('token');
             const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -96,8 +114,8 @@ function ModalCreateNewProduct(props: any) {
                         brandId: Number(brandId),
                         point: Number(productPoint),
                         imageLinks: imageListData,
-                        description : productDescription.trim(),
-                        quantity : productQuantity
+                        description: productDescription.trim(),
+                        quantity: productQuantity
                     })
                 }
             );
@@ -115,6 +133,48 @@ function ModalCreateNewProduct(props: any) {
         }
     }
 
+    const handleUpdateProduct = async () => {
+        try {
+            const url: string = `http://localhost:8083/staff-api/updateProduct`;
+            const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        productId: props.productId,
+                        productName: productName.trim(),
+                        productPrice: Number(productPrice),
+                        productUnitId: Number(productUnitId),
+                        brandId: Number(brandId),
+                        point: Number(productPoint),
+                        description: productDescription.trim(),
+                        quantity: Number(productQuantity),
+                        imageList: images,
+                        dateCreated: new Date()
+                    })
+                }
+            );
+
+            if (response.ok) {
+                alert('Chỉnh sửa sản phẩm thành công');
+                resetProductForm();
+                props.handleCloseModalCreatePopup();
+            } else {
+                console.log(response.json());
+                alert('Chỉnh sửa sản phẩm lỗi');
+            }
+        } catch (error) {
+            alert('Chỉnh sửa sản phẩm lỗi');
+        }
+    }
+    const handleButtonClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click(); // Kích hoạt click trên input
+        }
+    };
+
     useEffect(() => {
         getAllBrands().then((data) => {
             setBrands(data);
@@ -126,7 +186,7 @@ function ModalCreateNewProduct(props: any) {
         }).catch((error) => {
             console.log(error);
         });
-        if (Number(props.productId) !== 0) {
+        if (props.type === 'U') {
             getProductByProductId(Number(props.productId)).then((data) => {
                 setProductName(data.productName ? data.productName : '');
                 setProductDescription(data.description ? data.description : '');
@@ -138,96 +198,148 @@ function ModalCreateNewProduct(props: any) {
             }).catch((error) => {
                 console.log(error);
             })
+            getAllImagesOfProductId(Number(props.productId)).then((data) => {
+                setImages(data);
+            }).catch((error) => {
+                console.log(error);
+            })
         }
     }, [props.productId]);
     return (
         <div className={'product-create-detail-area'}>
             <Modal
-                   {...props}
-                size="md"
+                {...props}
+                size={props.showEditImageForm ? 'lg' : 'md'}
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        <strong className={'text-center'}>Thêm Mới Sản Phẩm</strong>
+                        <strong hidden={props.showEditImageForm}
+                                className={'text-center'}>{props.type === 'C' ? 'Thêm Mới Sản Phẩm' : 'Thông tin sản phẩm'}</strong>
+                        <strong style={{cursor: 'pointer', display: 'flex', alignItems: 'center'}}
+                                hidden={!props.showEditImageForm} className={'text-center'}
+                                onClick={() => props.setShowEditImageForm(false)}><FontAwesomeIcon
+                            style={{marginRight: '10px'}}
+                            icon={faArrowLeft}/> Quay lại trang thông tin sản phẩm </strong>
 
                     </Modal.Title>
                 </Modal.Header>
 
-                <div style={ processImg ?{pointerEvents : 'none'} : {pointerEvents : 'auto'}}>
+                <div style={processImg ? {pointerEvents: 'none'} : {pointerEvents: 'auto'}}>
                     <Modal.Body>
-                        <div className="form-group">
-                            <label htmlFor="brand">Danh mục sản phẩm<small>*</small></label>
-                            <select name="brand" id="brand" className={'form-control'} onChange={handleChangeBrand}>
-                                {
-                                    brands.map((brand) => (
-                                        <option key={brand.brandId} value={brand.brandId}>{brand.brandName}</option>
-                                    ))
-                                }
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="productName">Tên sản phẩm<small>*</small></label>
-                            <input value={productName} onChange={handleChangeProductName} required type="text"
-                                   className="form-control" id="productName"
-                                   placeholder="Tên sản phẩm"/>
-                        </div>
-                        <div className="price-uint-area">
-                            <div className="form-group" id={'price-uint-area-price'}>
-                                <label htmlFor="productPrice">Giá sản phẩm(VNĐ)<small>*</small></label>
-                                <input value={productPrice} onChange={handleChangeProductPrice} required type="text"
-                                       className="form-control" id="productPrice"
-                                       placeholder="Giá sản phẩm"/>
-                            </div>
-                            <div className="form-group" id={'price-uint-area-productUnit'}>
-                                <label htmlFor="productUnit">Đơn vị tính<small>*</small></label>
-                                <select name="productUnit" id="productUnit" className={'form-control'}
-                                        onChange={handleChangeProductUnitId}>
+                        <div hidden={props.showEditImageForm} className="product-create-detail-content">
+
+                            <div className="form-group">
+                                <label htmlFor="brand">Danh mục sản phẩm<small>*</small></label>
+                                <select name="brand" id="brand" className={'form-control'} onChange={handleChangeBrand}>
                                     {
-                                        productUnits.map((productUnit) => (
-                                            <option key={productUnit.productUnitId}
-                                                    value={productUnit.productUnitId}>{productUnit.productUnitName}</option>
+                                        brands.map((brand) => (
+                                            <option key={brand.brandId} value={brand.brandId}>{brand.brandName}</option>
                                         ))
                                     }
                                 </select>
                             </div>
-                            <div className="form-group" id={'price-uint-area-quantity'}>
-                                <label htmlFor="productQuantity">Số lượng<small>*</small></label>
-                                <input value={productQuantity} onChange={handleChangeProductQuantity} required
+                            <div className="form-group">
+                                <label htmlFor="productName">Tên sản phẩm<small>*</small></label>
+                                <input value={productName} onChange={handleChangeProductName} required type="text"
+                                       className="form-control" id="productName"
+                                       placeholder="Tên sản phẩm"/>
+                            </div>
+                            <div className="price-uint-area">
+                                <div className="form-group" id={'price-uint-area-price'}>
+                                    <label htmlFor="productPrice">Giá sản phẩm(VNĐ)<small>*</small></label>
+                                    <input value={productPrice} onChange={handleChangeProductPrice} required type="text"
+                                           className="form-control" id="productPrice"
+                                           placeholder="Giá sản phẩm"/>
+                                </div>
+                                <div className="form-group" id={'price-uint-area-productUnit'}>
+                                    <label htmlFor="productUnit">Đơn vị tính<small>*</small></label>
+                                    <select name="productUnit" id="productUnit" className={'form-control'}
+                                            onChange={handleChangeProductUnitId}>
+                                        {
+                                            productUnits.map((productUnit) => (
+                                                <option key={productUnit.productUnitId}
+                                                        value={productUnit.productUnitId}>{productUnit.productUnitName}</option>
+                                            ))
+                                        }
+                                    </select>
+                                </div>
+                                <div className="form-group" id={'price-uint-area-quantity'}>
+                                    <label htmlFor="productQuantity">Số lượng<small>*</small></label>
+                                    <input value={productQuantity} onChange={handleChangeProductQuantity} required
+                                           type="text"
+                                           className="form-control" id="productQuantity"
+                                           placeholder="Số lượng"/>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="productPoint">Điểm tích lũy</label>
+                                <input value={productPoint} onChange={handleChangeProductPoint} required type="text"
+                                       className="form-control" id="productPoint"
+                                       placeholder="Điểm tích lũy"/>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="productDescription">Mô tả sản phẩm</label>
+                                <input value={productDescription} onChange={handleChangeProductDescription} required
                                        type="text"
-                                       className="form-control" id="productQuantity"
-                                       placeholder="Số lượng"/>
+                                       className="form-control" id="productDescription"
+                                       placeholder="Mô tả sản phẩm"/>
+                            </div>
+                            <div className="form-group">
+                                <input ref={fileInputRef} hidden required type="file" multiple
+                                       className="form-control" id="imageProduct" onChange={onImagesInputChange}/>
+                                <button hidden={images.length > 0 || processImg} className={'add-image-button'} onClick={handleButtonClick}>
+                                    <FontAwesomeIcon
+                                        icon={faImages}/>
+                                    Thêm ảnh
+                                </button>
+
+                                <div onClick={showEditImage}
+                                     className={'show-image-edit-product'} hidden={images.length === 0}>
+                                    Chỉnh sửa hình ảnh
+                                </div>
+                            </div>
+                            <Waiting isDone={processImg}/>
+                            <button onClick={props.type === 'C' ? handleSaveProduct : handleUpdateProduct}
+                                    style={{width: '100%'}} className={'btn btn-primary'}>Lưu
+                                sản phẩm
+                            </button>
+                        </div>
+                        <div hidden={!props.showEditImageForm} className={'edit-image-form'}>
+                            <div className="edit-image-content">
+                                {
+                                    images.map((image, index) => (
+                                        <div className={'edit-image-item'}>
+                                            <img src={image.imageLink} alt="anh"/>
+                                            <button onClick={() => deleteImage(index)}
+                                                    title={'Xóa bỏ ảnh'} className={'btn btn-danger'}><FontAwesomeIcon
+                                                icon={faTimes}/></button>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                            <div className="form-group">
+                                <input hidden required type="file" multiple
+                                       className="form-control"
+                                       id="imageProduct"
+                                       onChange={onImagesInputChange}
+                                       ref={fileInputRef}
+                                />
+
+                                <button style={{marginTop : '20px'}} className={'add-image-button'} onClick={handleButtonClick}>
+                                    <FontAwesomeIcon
+                                        icon={faImages}/>
+                                    Thêm ảnh
+                                </button>
                             </div>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="productPoint">Điểm tích lũy</label>
-                            <input value={productPoint} onChange={handleChangeProductPoint} required type="text"
-                                   className="form-control" id="productPoint"
-                                   placeholder="Điểm tích lũy"/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="productDescription">Mô tả sản phẩm</label>
-                            <input value={productDescription} onChange={handleChangeProductDescription} required
-                                   type="text"
-                                   className="form-control" id="productDescription"
-                                   placeholder="Mô tả sản phẩm"/>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="imageProduct">Ảnh sản phẩm</label>
-                            <input required type="file" multiple
-                                   className="form-control" id="imageProduct" onChange={onImagesInputChange}/>
-                        </div>
-                        <Waiting isDone={processImg}/>
-                        <button onClick={handleSaveProduct} style={{width: '100%'}} className={'btn btn-primary'}>Lưu
-                            sản phẩm
-                        </button>
                     </Modal.Body>
                 </div>
             </Modal>
 
-        </div>
 
+        </div>
     )
 }
 
