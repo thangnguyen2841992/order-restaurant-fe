@@ -7,6 +7,7 @@ import Register from "./layout/auth/Register";
 import Login from "./layout/auth/Login";
 import AdminHome from "./layout/admin/AdminHome";
 import StaffHome from "./layout/staff/StaffHome";
+import UserHome from "./layout/user/UserHome";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                   <Route path = "/login" element={<Login/>}></Route>
                   <Route path = "/admin/home" element={<AdminHome/>}></Route>
                   <Route path = "/staff/home" element={<StaffHome/>}></Route>
+                  <Route path = "/user/home" element={<UserHome/>}></Route>
                   <Route path = "/" element={<Login/>}></Route>
               </Routes>
           </BrowserRouter>

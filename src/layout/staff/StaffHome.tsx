@@ -5,6 +5,8 @@ import Product from "../../model/Product";
 import {getAllProducts, getAllProductsOfBrand} from "../../api/Staff-Api";
 import ImageProduct from "./ImageProduct";
 import ModalCreateNewProduct from "./ModalCreateNewProduct";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faTrash} from "@fortawesome/free-solid-svg-icons";
 
 function StaffHome() {
     const [actionModalCreateUpdate, setActionModalCreateUpdate] = useState(false);
@@ -12,35 +14,72 @@ function StaffHome() {
     const [menuStaff, setMenuStaff] = useState<string>('listProduct');
     const [products, setProducts] = useState<Product[]>([]);
     const [brandId, setBrandId] = useState(0);
-    const handleChangeMenuStaff = (value: string) => {
-        setMenuStaff(value);
-    };
-    const handleChangeBrandIdSelect = (value: string) => {
-       setBrandId(Number(value));
-    };
     const [showModalCreatePopup, setShowModalCreatePopup] = useState(false);
     const [resetModalCreatePopup, setResetPropProduct] = useState(false);
     const [type, setType] = useState('C');
     const [productId, setProductId] = useState(0);
+    const token = localStorage.getItem('token');
+
+
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const ITEMS_PER_PAGE = 10; // Số sản phẩm hiển thị mỗi trang
+    const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+// Lấy sản phẩm cho trang hiện tại
+    const displayedProducts = products.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     const handleShowModalCreatePopup = (productId: number, type :string) => {
         setShowModalCreatePopup(true);
         setType(type);
         setProductId(productId);
     };
-    const getAllProduct = () => {
-        getAllProducts().then((data) => {
-            setProducts(data);
-        }).catch((error) => {
-            console.log(error);
-        })
-    }
 
     const handleCloseModalCreatePopup = () => {
         setShowModalCreatePopup(false);
         setResetPropProduct(true);
         setShowEditImageForm(false);
     }
+
+    const handleChangeMenuStaff = (value: string) => {
+        setMenuStaff(value);
+    };
+    const handleChangeBrandIdSelect = (value: string) => {
+        setBrandId(Number(value));
+    };
+
+    const deleteProduct = async (productId : number) => {
+        try {
+            const url: string = `http://localhost:8083/staff-api/deleteProduct?productId=${productId}`;
+            const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                }
+            );
+
+            if (response.ok) {
+                alert('Xóa sản phẩm thành công');
+                setActionModalCreateUpdate(true);
+            } else {
+                console.log(response.json());
+                alert('Xóa sửa sản phẩm lỗi');
+            }
+        } catch (error) {
+            alert('Xóa sửa sản phẩm lỗi');
+        }
+    }
+
+    useEffect(() => {
+        getAllProducts().then((data) => {
+            setProducts(data);
+        }).catch((error) => {
+            console.log(error);
+        })
+    }, []);
 
     useEffect(() => {
         if (Number(brandId) !== 0) {
@@ -84,13 +123,14 @@ function StaffHome() {
                                 <th scope="col">Điểm Tích Lũy</th>
                                 <th scope="col">Mô tả sản phẩm</th>
                                 <th scope="col">Ảnh Sản Phẩm</th>
-
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Hành động </th>
                             </tr>
                             </thead>
                             <tbody>
                             {
-                                products.length > 0 ? (products.map((product, index) => (
-                                    <tr>
+                                displayedProducts.length > 0 ? (displayedProducts.map((product, index) => (
+                                    <tr key={product.productId}>
                                         <th scope="row">{index + 1}</th>
                                         <td onClick={() => product.productId && handleShowModalCreatePopup(product.productId, 'U')}
                                             id={'td-product-name'}
@@ -102,6 +142,9 @@ function StaffHome() {
                                         <td>{product.point}</td>
                                         <td>{product.description}</td>
                                         <td><ImageProduct productId={product.productId ? product.productId : 0} actionModalCreateUpdate={actionModalCreateUpdate}/></td>
+                                        <td>{product.isDelete === true ? 'Đã xóa' : 'Đang kinh doanh'}</td>
+                                        <td>
+                                            <button onClick={() => deleteProduct(product.productId ? product.productId : 0)} title={'Xóa sản phẩm'} className={'btn btn-danger'}><FontAwesomeIcon icon={faTrash}/></button></td>
                                     </tr>
                                 ))) : (
                                     <tr>
@@ -118,6 +161,17 @@ function StaffHome() {
                             }
                             </tbody>
                         </table>
+                        {/* Nút phân trang */}
+                        <div hidden={products.length === 0} className="pagination">
+                            {Array.from({ length: totalPages }, (_, index) => (
+                                <button
+                                    key={index + 1}
+                                    onClick={() => setCurrentPage(index + 1)}
+                                    disabled={index + 1 === currentPage}>
+                                    {index + 1}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                 </div>

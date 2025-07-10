@@ -318,7 +318,7 @@ function ModalCreateNewProduct(props: any) {
                             <div className="edit-image-content">
                                 {
                                     images.map((image, index) => (
-                                        <div className={'edit-image-item'}>
+                                        <div key={image.imageId} className={'edit-image-item'}>
                                             <img src={image.imageLink} alt="anh"/>
                                             <button onClick={() => deleteImage(index)}
                                                     title={'Xóa bỏ ảnh'} className={'btn btn-danger'}><FontAwesomeIcon

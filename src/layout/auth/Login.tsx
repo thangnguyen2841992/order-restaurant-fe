@@ -69,6 +69,9 @@ function Login() {
                     } else if (getUserToken().isStaff) {
                         setRole("staff");
                         navigate('/staff/home');
+                    } else {
+                        setRole("user");
+                        navigate('/user/home');
                     }
                     alert("Đăng nhập thành công");
                     console.log(role);

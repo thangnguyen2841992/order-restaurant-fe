@@ -124,13 +124,15 @@
     text-decoration: underline;
 }
 
-.nav-admin, .nav-staff {
+.nav-admin, .nav-staff, .nav-user {
     height: 50px;
     background: white;
     padding: 10px 50px;
     display: flex;
     align-items: center;
     border-bottom: 1px solid #e5e5e5;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+
 }
 
 .nav-admin-item, .nav-staff-item {
@@ -327,4 +329,82 @@ td {
 .add-image-button-icon {
     color: green;
     font-size: 20px;
+}
+.pagination {
+    display: flex;
+    justify-content: center; /* Căn giữa nội dung */
+    margin-top: 20px; /* Khoảng cách phía trên */
+}
+
+.pagination button {
+    background-color: #007bff; /* Màu nền */
+    color: white; /* Màu chữ */
+    border: none; /* Không có viền */
+    padding: 10px 15px; /* Padding cho nút */
+    margin: 0 5px; /* Khoảng cách giữa các nút */
+    border-radius: 5px; /* Bo góc */
+    cursor: pointer; /* Hiển thị con trỏ khi hover */
+    transition: background-color 0.3s; /* Hiệu ứng chuyển đổi màu */
+}
+
+.pagination button:hover {
+    background-color: #0056b3; /* Màu nền khi hover */
+}
+
+.pagination button:disabled {
+    background-color: #cccccc; /* Màu nền cho nút bị vô hiệu hóa */
+    cursor: not-allowed; /* Hiển thị con trỏ không cho phép */
+}
+
+.user-home-header {
+    padding: 10px 50px;
+    border-bottom: 1px solid #e5e5e5;
+}
+.user-home-header-top {
+    display: flex;
+}
+.user-home-header-top-home {
+    color: #007bff;
+    font-size: 15px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+.user-home-header-top-home:hover {
+    text-decoration: underline;
+}
+.user-home-header-top-brand-name {
+    margin-left: 5px;
+    font-size: 15px;
+    color: #7a7e80;
+}
+.user-home-header-bottom-left {
+    font-size: 20px;
+    color: #007bff;
+}
+.user-home-header-bottom {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 5px;
+}
+.user-home-header-bottom-right {
+    color: #7a7e80;
+    margin-left: 20px;
+    font-size: 18px;
+}
+.user-home-middle {
+    padding: 30px 5%;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+.user-home-middle-item {
+    width: 18%; /* Chiếm 18% chiều rộng */
+    margin: 1%; /* Khoảng cách giữa các phần tử */
+    box-sizing: border-box; /* Đảm bảo padding và border không làm thay đổi kích thước */
+    padding: 10px; /* Padding cho phần tử */
+    background-color: #f8f9fa; /* Màu nền */
+    border: 1px solid #ccc; /* Border */
+    border-radius: 5px; /* Bo góc */
+    text-align: center; /* Căn giữa chữ */
 }

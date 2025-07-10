@@ -25,7 +25,9 @@ export async function getAllProducts(): Promise<Product[]> {
                 quantity: responseData[key].quantity,
                 point: responseData[key].point,
                 brand: responseData[key].brand,
-                productUnit: responseData[key].productUnit
+                productUnit: responseData[key].productUnit,
+                isDelete: responseData[key].delete
+
             }
         );
     }
@@ -55,7 +57,9 @@ export async function getAllProductsOfBrand(brandId: number): Promise<Product[]>
                 quantity: responseData[key].quantity,
                 point: responseData[key].point,
                 brand: responseData[key].brand,
-                productUnit: responseData[key].productUnit
+                productUnit: responseData[key].productUnit,
+                isDelete: responseData[key].delete
+
             }
         );
     }
@@ -81,6 +85,8 @@ export async function getProductByProductId(productId: number): Promise<Product>
         quantity: responseData.quantity,
         point: responseData.point,
         brand: responseData.brand,
-        productUnit: responseData.productUnit
+        productUnit: responseData.productUnit,
+        isDelete: responseData.delete
+
     };
 }
