@@ -4,14 +4,16 @@ import {faHeart, faSearch, faShoppingCart} from "@fortawesome/free-solid-svg-ico
 import {getUserToken, isTokenExpired} from "../../api/Public-Api";
 import {useNavigate} from "react-router-dom";
 import {Dropdown} from "react-bootstrap";
+import CartResponse from "../../model/CartResponse";
 
 interface NavbarInterface {
-
+    cartResponse : CartResponse;
 }
 
-const Navbar: React.FC<NavbarInterface> = () => {
+const Navbar: React.FC<NavbarInterface> = ({cartResponse}) => {
     const navigate = useNavigate();
     const fullName = getUserToken().fullName;
+    const totalProductCart = cartResponse.productCartList?.length;
 
     const logout = () => {
         localStorage.removeItem('token');
@@ -36,25 +38,30 @@ const Navbar: React.FC<NavbarInterface> = () => {
                 <img src={'/logo3-removebg-preview.png'} alt=""/>
             </div>
             <div className="navbar-area-search">
-                <input type="text" placeholder={'Bạn cần tìm sản phẩm gì?'}/>
+                <input type="text" placeholder={'どの製品を見つける必要がありますか？'}/>
                 <button className={'btn btn-danger'}>
                     <FontAwesomeIcon icon={faSearch}/>
                 </button>
             </div>
             <div className={'navbar-area-action'}>
-                    <button title={'Yêu Thích'}>
+                    <button id={'btnLikeProduct'}  title={'お気に入り'}>
                         <FontAwesomeIcon icon={faHeart}/>
                     </button>
+                    <div className={'cart-area'}>
+                        <button id={'btnCartProduct'} title={'ショッピングカート'}>
+                            <FontAwesomeIcon icon={faShoppingCart}/>
+                        </button>
+                        <div className={'totalProductCart'}>
+                            {totalProductCart}
+                        </div>
+                    </div>
 
-                    <button title={'Giỏ Hàng'}>
-                        <FontAwesomeIcon icon={faShoppingCart}/>
-                    </button>
                 <Dropdown >
                     <Dropdown.Toggle variant="success" id="dropdown-basic">
-                           Xin chào: {fullName}
+                        おはよう: {fullName}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                        <Dropdown.Item onClick={logout} eventKey="Option 1">Đăng xuất</Dropdown.Item>
+                        <Dropdown.Item onClick={logout} eventKey="Option 1">ログアウト</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </div>

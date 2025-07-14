@@ -6,6 +6,8 @@ import {getAllUsers} from "../../api/Admin-Api";
 import {formatDate, formatDateTime} from "../../api/Public-Api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBan, faCheck} from "@fortawesome/free-solid-svg-icons";
+import ProductCart from "../../model/ProductCart";
+import CartResponse from "../../model/CartResponse";
 
 function AdminHome() {
     const [users, setUsers] = useState<User[]>([])
@@ -13,6 +15,8 @@ function AdminHome() {
     const handleChangeMenuAdmin = (value: string) => {
         setMenuAdmin(value);
     };
+
+    const [cartResults, setCartResults] = useState<CartResponse>({});
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -158,7 +162,7 @@ function AdminHome() {
     },[menuAdmin])
     return (
         <div className={'admin-home-area'}>
-            <Navbar/>
+            <Navbar cartResponse={cartResults}/>
             <NavAdmin handleChangeMenuAdmin={handleChangeMenuAdmin}/>
             <div className="admin-home-content">
                 <div className="admin-home-left">

@@ -11,13 +11,15 @@ import {faHeart} from "@fortawesome/free-solid-svg-icons";
 import {Client} from "@stomp/stompjs";
 import SockJS from 'sockjs-client';
 import {getUserToken} from "../../api/Public-Api";
+import CartResponse from "../../model/CartResponse";
 
 
 function UserHome() {
     const [menuStaff, setMenuStaff] = useState<string>('listProduct');
     const [brandId, setBrandId] = useState(0);
-    const [brandName, setBrandName] = useState('Thực phẩm tươi sống');
+    const [brandName, setBrandName] = useState('新鮮な食べ物');
     const [products, setProducts] = useState<Product[]>([]);
+    const [cartResults, setCartResults] = useState<CartResponse>({});
     const userTokenId = getUserToken().userId;
 
     const handleChangeMenuUser = (value: string) => {
@@ -44,6 +46,13 @@ function UserHome() {
                 stompClient.subscribe('/topic/cart', (message) => {
                     const cart = JSON.parse(message.body);
                     console.log(cart);
+                    const cartResponse : CartResponse = {
+                        cartId : cart.cartId,
+                        dateCreated : cart.dateCreated,
+                        productCartList : cart.productCartList,
+                        userId : cart.userId
+                    }
+                    setCartResults(cartResponse);
                 });
             },
             webSocketFactory: () => {
@@ -92,12 +101,12 @@ function UserHome() {
     }
     return (
         <div className={'user-home-area'}>
-            <Navbar/>
+            <Navbar cartResponse={cartResults} />
              <div className="user-home-content">
              <NavUser handleChangeMenuUser={handleChangeMenuUser} handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
                 <div className="user-home-header">
                     <div className="user-home-header-top">
-                        <div className={'user-home-header-top-home'}>Trang chủ</div>
+                        <div className={'user-home-header-top-home'}>家</div>
                         <div>{'>'}</div>
                         <div className={'user-home-header-top-brand-name'}>{brandName}</div>
                     </div>
@@ -106,7 +115,7 @@ function UserHome() {
                             {brandName}
                         </div>
                         <div className="user-home-header-bottom-right">
-                            1210 sản phẩm
+                            1210 製品
                         </div>
                     </div>
                 </div>
@@ -119,7 +128,7 @@ function UserHome() {
                                  </div>
                                  <div className="user-home-middle-item-price">
                                      {product.productPrice?.toLocaleString() }
-                                     <u>đ</u> / {product.productUnit?.productUnitName}
+                                     <u>¥</u> / {product.productUnit?.productUnitName}
                                  </div>
                                  <div className="user-home-middle-item-price-origin">
                                      <PriceOriginComponent price={product.productPrice ? product.productPrice : 1000}/>
@@ -129,14 +138,14 @@ function UserHome() {
                                  </div>
                                  <div className="user-home-middle-item-button">
                                      <button type={'button'} className={'btn-like-product'}><FontAwesomeIcon icon={faHeart}/></button>
-                                     <button onClick={() => addCart(product.productId ?  product.productId : 0)} type={'button'} className={'btn btn-primary'}>Thêm vào giỏ</button>
+                                     <button onClick={() => addCart(product.productId ?  product.productId : 0)} type={'button'} className={'btn btn-danger'}>カートに追加します</button>
                                  </div>
                                  <div hidden={product.point == 0} className="user-home-middle-item-point-area">
                                      <div className="user-home-middle-item-point">
                                          x{product.point}
                                      </div>
                                      <div className="user-home-middle-item-point-des">
-                                         Điểm tích lũy
+                                         ポイント
                                      </div>
                                  </div>
                              </div>

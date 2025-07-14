@@ -7,6 +7,7 @@ import ImageProduct from "./ImageProduct";
 import ModalCreateNewProduct from "./ModalCreateNewProduct";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTrash} from "@fortawesome/free-solid-svg-icons";
+import CartResponse from "../../model/CartResponse";
 
 function StaffHome() {
     const [actionModalCreateUpdate, setActionModalCreateUpdate] = useState(false);
@@ -19,6 +20,7 @@ function StaffHome() {
     const [type, setType] = useState('C');
     const [productId, setProductId] = useState(0);
     const token = localStorage.getItem('token');
+    const [cartResponse, setCartResponse] = useState<CartResponse>({});
 
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -99,7 +101,7 @@ function StaffHome() {
     }, [brandId, actionModalCreateUpdate])
     return (
         <div className={'staff-home-area'}>
-            <Navbar/>
+            <Navbar cartResponse={cartResponse} />
             <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
                       handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
             <div className="staff-home-content">

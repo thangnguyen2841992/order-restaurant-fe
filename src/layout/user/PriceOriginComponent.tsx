@@ -11,7 +11,7 @@ const PriceOriginComponent: React.FC<PriceOriginComponentProps> = ({price}) => {
     return (
         <div className={'price-origin-component'}>
             <div className="price-origin-component-price">
-                {discountedPrice.toLocaleString()} <u>đ</u>
+                {discountedPrice.toLocaleString()} <u>¥</u>
             </div>
             <div className="price-origin-component-percent">
                 -{discountPercentage.toFixed(0)} %

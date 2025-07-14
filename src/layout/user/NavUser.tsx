@@ -34,7 +34,7 @@ const NavUser: React.FC<NavUserInterface> = ({handleChangeMenuUser, handleChange
             <Dropdown onSelect={handleSelect}>
                 <Dropdown.Toggle variant="light" id="dropdown-basic" className="nav-staff-item">
                         <FontAwesomeIcon icon={faList}/>
-                        <b style={{marginLeft : '5px'}}>{'Danh mục sản phẩm'}</b>
+                        <b style={{marginLeft : '5px'}}>{'製品カタログ'}</b>
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
