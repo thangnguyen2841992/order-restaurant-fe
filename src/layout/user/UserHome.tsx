@@ -1,8 +1,7 @@
 import Navbar from "../shared/Navbar";
-import NavStaff from "../staff/NavStaff";
 import NavUser from "./NavUser";
 import React, {useEffect, useState} from "react";
-import {getAllProducts, getAllProductsOfBrand} from "../../api/Staff-Api";
+import {getAllProductsOfBrand} from "../../api/Staff-Api";
 import Product from "../../model/Product";
 import {getAllProductsUser} from "../../api/User-Api";
 import ImgProductUser from "./ImgProductUser";
@@ -11,6 +10,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHeart} from "@fortawesome/free-solid-svg-icons";
 import {Client} from "@stomp/stompjs";
 import SockJS from 'sockjs-client';
+import {getUserToken} from "../../api/Public-Api";
 
 
 function UserHome() {
@@ -18,6 +18,7 @@ function UserHome() {
     const [brandId, setBrandId] = useState(0);
     const [brandName, setBrandName] = useState('Thực phẩm tươi sống');
     const [products, setProducts] = useState<Product[]>([]);
+    const userTokenId = getUserToken().userId;
 
     const handleChangeMenuUser = (value: string) => {
         setMenuStaff(value);
@@ -26,6 +27,8 @@ function UserHome() {
         setBrandId(Number(value));
     };
     const [client, setClient] = useState<Client | null>(null);
+
+
 
     useEffect(() => {
         const stompClient = new Client({
@@ -71,6 +74,22 @@ function UserHome() {
             })
         }
     }, [brandId])
+
+    const addCart = (productId : number) => {
+        if (client) {
+            let messageCartSend =  JSON.stringify({
+                userId : userTokenId,
+                product : {
+                    productId : productId,
+                    quantity : 2
+                }
+            })
+            client.publish({
+                destination: '/app/add-cart',
+                body: messageCartSend
+            });
+        }
+    }
     return (
         <div className={'user-home-area'}>
             <Navbar/>
@@ -110,7 +129,7 @@ function UserHome() {
                                  </div>
                                  <div className="user-home-middle-item-button">
                                      <button type={'button'} className={'btn-like-product'}><FontAwesomeIcon icon={faHeart}/></button>
-                                     <button type={'button'} className={'btn btn-primary'}>Thêm vào giỏ</button>
+                                     <button onClick={() => addCart(product.productId ?  product.productId : 0)} type={'button'} className={'btn btn-primary'}>Thêm vào giỏ</button>
                                  </div>
                                  <div hidden={product.point == 0} className="user-home-middle-item-point-area">
                                      <div className="user-home-middle-item-point">
