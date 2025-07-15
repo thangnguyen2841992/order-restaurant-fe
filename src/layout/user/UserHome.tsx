@@ -7,11 +7,12 @@ import {getAllProductsUser} from "../../api/User-Api";
 import ImgProductUser from "./ImgProductUser";
 import PriceOriginComponent from "./PriceOriginComponent";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faHeart} from "@fortawesome/free-solid-svg-icons";
+import {faHeart, faShoppingCart, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {Client} from "@stomp/stompjs";
 import SockJS from 'sockjs-client';
 import {getUserToken} from "../../api/Public-Api";
 import CartResponse from "../../model/CartResponse";
+import {getCartResponseOfUserId} from "../../api/Cart-Api";
 
 
 function UserHome() {
@@ -21,6 +22,7 @@ function UserHome() {
     const [products, setProducts] = useState<Product[]>([]);
     const [cartResults, setCartResults] = useState<CartResponse>({});
     const userTokenId = getUserToken().userId;
+    const [showCartArea, setShowCartArea] = useState(false);
 
     const handleChangeMenuUser = (value: string) => {
         setMenuStaff(value);
@@ -30,7 +32,21 @@ function UserHome() {
     };
     const [client, setClient] = useState<Client | null>(null);
 
+    const checkProductCartExist = (productId : number)  => {
+        if (cartResults.productCartList === undefined) return 0;
+        if (cartResults.productCartList.length > 0) {
+            for (const productCart of cartResults.productCartList) {
+                if (productCart.productId === productId) return productCart.quantity;
+            }
+        }
+        return 0;
+    }
 
+    useEffect(() => {
+        getCartResponseOfUserId().then((data) => {
+            setCartResults(data);
+        })
+    }, []);
 
     useEffect(() => {
         const stompClient = new Client({
@@ -90,7 +106,7 @@ function UserHome() {
                 userId : userTokenId,
                 product : {
                     productId : productId,
-                    quantity : 2
+                    quantity : 1
                 }
             })
             client.publish({
@@ -99,9 +115,25 @@ function UserHome() {
             });
         }
     }
+
+    const editQuantity = (productId : number, type : number) => {
+        if (client) {
+            let messageEditQuantitySend =  JSON.stringify({
+                userId : userTokenId,
+                productId : productId,
+                quantity: type
+
+            })
+            client.publish({
+                destination: '/app/edit-quantity',
+                body: messageEditQuantitySend
+            });
+        }
+    }
+
     return (
         <div className={'user-home-area'}>
-            <Navbar cartResponse={cartResults} />
+            <Navbar cartResponse={cartResults} handleShowHideCartArea={setShowCartArea}/>
              <div className="user-home-content">
              <NavUser handleChangeMenuUser={handleChangeMenuUser} handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
                 <div className="user-home-header">
@@ -131,14 +163,25 @@ function UserHome() {
                                      <u>¥</u> / {product.productUnit?.productUnitName}
                                  </div>
                                  <div className="user-home-middle-item-price-origin">
-                                     <PriceOriginComponent price={product.productPrice ? product.productPrice : 1000}/>
+                                     <PriceOriginComponent price={product.productOriginalPrice ? product.productOriginalPrice : 1000} percent={product.productPercent ? product.productPercent : 0}/>
                                  </div>
                                  <div className="user-home-middle-item-productNm">
                                      {product.productName}
                                  </div>
                                  <div className="user-home-middle-item-button">
-                                     <button type={'button'} className={'btn-like-product'}><FontAwesomeIcon icon={faHeart}/></button>
-                                     <button onClick={() => addCart(product.productId ?  product.productId : 0)} type={'button'} className={'btn btn-danger'}>カートに追加します</button>
+                                     <button style={checkProductCartExist(product.productId ? product.productId : 0) == 0 ?  {marginRight : '55%'} : {marginRight : '12%'}} title={'お気に入りのリストを追加します'} type={'button'} className={'btn-like-product'}><FontAwesomeIcon icon={faHeart}/></button>
+                                      <div hidden={checkProductCartExist(product.productId ? product.productId : 0) == 0}  className={'edit-quantity-product'}>
+                                          <button  onClick={() => editQuantity(product.productId ? product.productId : 0 , 0)}>
+                                              -
+                                          </button>
+                                          <div className={'productQuantity'}>
+                                              {checkProductCartExist(product.productId ? product.productId : 0)}
+                                          </div>
+                                          <button onClick={() => editQuantity(product.productId ? product.productId : 0 , 1)}>
+                                              +
+                                          </button>
+                                      </div>
+                                     <button hidden={checkProductCartExist(product.productId ? product.productId : 0) != 0}  title={'カートに追加します'} onClick={() => addCart(product.productId ?  product.productId : 0)} type={'button'} className={'btn btn-danger'}><FontAwesomeIcon icon={faShoppingCart}/></button>
                                  </div>
                                  <div hidden={product.point == 0} className="user-home-middle-item-point-area">
                                      <div className="user-home-middle-item-point">
@@ -150,12 +193,60 @@ function UserHome() {
                                  </div>
                              </div>
                          ))
-
                      }
-
                  </div>
             </div>
+            <div className="cart-detail-area" hidden={!showCartArea}>
+                <div className="cart-detail-area-header">
+                    <div className="cart-detail-area-header-left">
+                        <div className="cart-detail-area-header-left-title">
+                            Giỏ Hàng
+                        </div>
+                        <div className="cart-detail-area-header-left-des">
+                            ({cartResults.productCartList?.length} sản phẩm)
+                        </div>
+                    </div>
+                    <div className="cart-detail-area-header-right" onClick={() => setShowCartArea(false)}>
+                        <div className={'cart-detail-area-header-right-text'}>
+                            Đóng
+                        </div>
+                        <div className={'cart-detail-area-header-right-icon'}>
+                            <FontAwesomeIcon icon={faTimes}/>
+                        </div>
+                    </div>
+                </div>
+                <div className="cart-detail-area-content">
+                    {
+                        cartResults.productCartList?.map((product, index) => (
+                            <div className="cart-detail-area-content-item">
+                                <div className="cart-detail-area-content-item-index">
+                                    {index + 1}
+                                </div>
+                                <div className="cart-detail-area-content-item-image">
 
+                                </div>
+                                <div className="cart-detail-area-content-item-name-price">
+
+                                </div>
+                                <div className="cart-detail-area-content-item-name">
+
+                                </div>
+                                <div className="cart-detail-area-content-item-price">
+
+                                </div>
+                                <div className="cart-detail-area-content-item-quantity">
+
+                                </div>
+                                <div className="cart-detail-area-content-item-total">
+
+                                </div>
+
+                            </div>
+                        ))
+                    }
+
+                </div>
+            </div>
         </div>
     )
 }

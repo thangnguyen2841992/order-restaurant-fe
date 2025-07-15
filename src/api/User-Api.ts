@@ -26,7 +26,10 @@ export async function getAllProductsUser(): Promise<Product[]> {
                 point: responseData[key].point,
                 brand: responseData[key].brand,
                 productUnit: responseData[key].productUnit,
-                isDelete: responseData[key].delete
+                isDelete: responseData[key].delete,
+                productOriginalPrice : calculateDiscountedPrice(responseData[key].productPrice).discountedPrice,
+                productPercent : calculateDiscountedPrice(responseData[key].productPrice).discountPercentage
+
 
             }
         );
@@ -34,3 +37,10 @@ export async function getAllProductsUser(): Promise<Product[]> {
 
     return products;
 }
+
+const calculateDiscountedPrice = (price: number): { discountedPrice: number; discountPercentage: number } => {
+    const discountPercentage = Math.floor(Math.random() * (15 - 5 + 1)) + 5;
+    const discountAmount = (price * discountPercentage) / 100;
+    const discountedPrice = price + discountAmount;
+    return {discountedPrice, discountPercentage};
+};

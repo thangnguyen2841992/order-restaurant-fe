@@ -21,6 +21,7 @@ function StaffHome() {
     const [productId, setProductId] = useState(0);
     const token = localStorage.getItem('token');
     const [cartResponse, setCartResponse] = useState<CartResponse>({});
+    const [test, setTest] = useState(false);
 
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -101,7 +102,7 @@ function StaffHome() {
     }, [brandId, actionModalCreateUpdate])
     return (
         <div className={'staff-home-area'}>
-            <Navbar cartResponse={cartResponse} />
+            <Navbar cartResponse={cartResponse} handleShowHideCartArea={setTest} />
             <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
                       handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
             <div className="staff-home-content">

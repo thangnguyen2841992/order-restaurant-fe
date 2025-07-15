@@ -7,19 +7,21 @@ import {Dropdown} from "react-bootstrap";
 import CartResponse from "../../model/CartResponse";
 
 interface NavbarInterface {
-    cartResponse : CartResponse;
+    cartResponse : CartResponse
+    handleShowHideCartArea : (value : boolean) => void
 }
 
-const Navbar: React.FC<NavbarInterface> = ({cartResponse}) => {
+const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea}) => {
     const navigate = useNavigate();
     const fullName = getUserToken().fullName;
-    const totalProductCart = cartResponse.productCartList?.length;
 
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('expirationTime');
         navigate('/login');
     }
+
+
     useEffect(() => {
         const interval = setInterval(() => {
             if (isTokenExpired()) {
@@ -47,12 +49,12 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse}) => {
                     <button id={'btnLikeProduct'}  title={'お気に入り'}>
                         <FontAwesomeIcon icon={faHeart}/>
                     </button>
-                    <div className={'cart-area'}>
+                    <div className={'cart-area'} onClick={() => handleShowHideCartArea(true)}>
                         <button id={'btnCartProduct'} title={'ショッピングカート'}>
                             <FontAwesomeIcon icon={faShoppingCart}/>
                         </button>
-                        <div className={'totalProductCart'}>
-                            {totalProductCart}
+                        <div hidden={cartResponse.productCartList?.length === 0} className={'totalProductCart'}>
+                            {cartResponse.productCartList?.length}
                         </div>
                     </div>
 

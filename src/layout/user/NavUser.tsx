@@ -40,7 +40,7 @@ const NavUser: React.FC<NavUserInterface> = ({handleChangeMenuUser, handleChange
                 <Dropdown.Menu>
                     {
                         brands.map((brand) => (
-                            <Dropdown.Item eventKey={brand.brandId}>{brand.brandName}</Dropdown.Item>
+                            <Dropdown.Item key={brand.brandId} eventKey={brand.brandId}>{brand.brandName}</Dropdown.Item>
                         ))
                     }
                 </Dropdown.Menu>

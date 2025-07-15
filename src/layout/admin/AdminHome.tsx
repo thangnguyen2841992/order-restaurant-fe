@@ -28,6 +28,7 @@ function AdminHome() {
     const [address, setAddress] = useState('');
     const [birthDay, setBirthDay] = useState(new Date().toISOString().split('T')[0]);
     const [gender, setGender] = useState(0);
+    const [test, setTest] = useState(false);
     const handleChangeFirstName = (e: ChangeEvent<HTMLInputElement>) => {
         setFirstName(e.target.value);
     }
@@ -162,8 +163,8 @@ function AdminHome() {
     },[menuAdmin])
     return (
         <div className={'admin-home-area'}>
-            <Navbar cartResponse={cartResults}/>
-            <NavAdmin handleChangeMenuAdmin={handleChangeMenuAdmin}/>
+            <Navbar cartResponse={cartResults} handleShowHideCartArea={setTest}/>
+            <NavAdmin handleChangeMenuAdmin={handleChangeMenuAdmin} />
             <div className="admin-home-content">
                 <div className="admin-home-left">
                 </div>
