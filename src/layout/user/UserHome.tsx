@@ -151,7 +151,7 @@ function UserHome() {
                         </div>
                     </div>
                 </div>
-                 <div className="user-home-middle">
+                 <div style={showCartArea ? {pointerEvents : 'none', opacity : '0.4'} : {pointerEvents : 'auto', opacity : '1'}} className="user-home-middle">
                      {
                          products.map((product) => (
                              <div key={product.productId} className="user-home-middle-item">
