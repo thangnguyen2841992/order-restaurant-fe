@@ -13,6 +13,7 @@ import SockJS from 'sockjs-client';
 import {getUserToken} from "../../api/Public-Api";
 import CartResponse from "../../model/CartResponse";
 import {getCartResponseOfUserId} from "../../api/Cart-Api";
+import CartDetailItem from "./CartDetailItem";
 
 
 function UserHome() {
@@ -218,30 +219,7 @@ function UserHome() {
                 <div className="cart-detail-area-content">
                     {
                         cartResults.productCartList?.map((product, index) => (
-                            <div className="cart-detail-area-content-item">
-                                <div className="cart-detail-area-content-item-index">
-                                    {index + 1}
-                                </div>
-                                <div className="cart-detail-area-content-item-image">
-
-                                </div>
-                                <div className="cart-detail-area-content-item-name-price">
-
-                                </div>
-                                <div className="cart-detail-area-content-item-name">
-
-                                </div>
-                                <div className="cart-detail-area-content-item-price">
-
-                                </div>
-                                <div className="cart-detail-area-content-item-quantity">
-
-                                </div>
-                                <div className="cart-detail-area-content-item-total">
-
-                                </div>
-
-                            </div>
+                            <CartDetailItem  productId={product.productId ? product.productId : 0} quantity={product.quantity ? product.quantity : 0} key={product.productId} index={index}  editQuantity={editQuantity}/>
                         ))
                     }
 
