@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import NavStaff from "./NavStaff";
 import Navbar from "../shared/Navbar";
 import Product from "../../model/Product";
@@ -8,6 +8,9 @@ import ModalCreateNewProduct from "./ModalCreateNewProduct";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTrash} from "@fortawesome/free-solid-svg-icons";
 import CartResponse from "../../model/CartResponse";
+import ModalUploadProduct from "./ModalUploadProduct";
+import * as XLSX from 'xlsx';
+
 
 function StaffHome() {
     const [actionModalCreateUpdate, setActionModalCreateUpdate] = useState(false);
@@ -22,7 +25,14 @@ function StaffHome() {
     const token = localStorage.getItem('token');
     const [cartResponse, setCartResponse] = useState<CartResponse>({});
     const [test, setTest] = useState(false);
-
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [showModalUploadProduct, setShowModalUploadProduct] = useState(false);
+    const [dataUpload, setDataUpload] = useState<any[]>([]);
+    const handleUploadExcel = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const ITEMS_PER_PAGE = 10; // Số sản phẩm hiển thị mỗi trang
@@ -33,7 +43,7 @@ function StaffHome() {
         currentPage * ITEMS_PER_PAGE
     );
 
-    const handleShowModalCreatePopup = (productId: number, type :string) => {
+    const handleShowModalCreatePopup = (productId: number, type: string) => {
         setShowModalCreatePopup(true);
         setType(type);
         setProductId(productId);
@@ -52,7 +62,7 @@ function StaffHome() {
         setBrandId(Number(value));
     };
 
-    const deleteProduct = async (productId : number) => {
+    const deleteProduct = async (productId: number) => {
         try {
             const url: string = `http://localhost:8083/staff-api/deleteProduct?productId=${productId}`;
             const response = await fetch(url, {
@@ -75,6 +85,59 @@ function StaffHome() {
             alert('Xóa sửa sản phẩm lỗi');
         }
     }
+
+    const closeModalUpload = () => {
+        setShowModalUploadProduct(false);
+    }
+
+    const onExcelFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const fileType = file.type;
+            if (fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                fileType === 'application/vnd.ms-excel') {
+                setShowModalUploadProduct(true);
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const arrayBuffer = e.target?.result;
+                    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+                    // Lấy dữ liệu từ sheet đầu tiên
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    // Bỏ qua dòng tiêu đề đầu tiên
+                    const dataWithoutHeader = jsonData.slice(1);
+
+                    const productUploads = dataWithoutHeader.map((row: any) => {
+                        const imageLinks = row[7] ? row[7].split(',') : [];
+                        const newImages = imageLinks.map((link : string) => ({
+                            imageLink: link.trim(),
+                        }));
+
+                        return {
+                            brandId: row[0].charAt(0),
+                            productName: row[1],
+                            productPrice: row[2],
+                            productUnitId: row[3].charAt(0),
+                            quantity: row[4],
+                            point: row[5],
+                            description: row[6],
+                            imageList: newImages // Mảng các đối tượng Image
+                        };
+                    });
+
+                    console.log(productUploads);
+                    setDataUpload(productUploads); // Lưu dữ liệu vào state
+                };
+
+                reader.readAsArrayBuffer(file);
+            } else {
+                alert("Vui lòng chọn một file Excel (.xls hoặc .xlsx)!");
+            }
+        }
+    };
 
     useEffect(() => {
         getAllProducts().then((data) => {
@@ -102,7 +165,7 @@ function StaffHome() {
     }, [brandId, actionModalCreateUpdate])
     return (
         <div className={'staff-home-area'}>
-            <Navbar cartResponse={cartResponse} handleShowHideCartArea={setTest} />
+            <Navbar cartResponse={cartResponse} handleShowHideCartArea={setTest}/>
             <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
                       handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
             <div className="staff-home-content">
@@ -110,9 +173,17 @@ function StaffHome() {
                 <div className="staff-home-middle">
                     <div hidden={menuStaff !== 'listProduct'} className="staff-home-middle-list">
                         <div className="staff-home-middle-header">
-                            DANH SÁCH SẢN PHẨM
-                            <button onClick={() => handleShowModalCreatePopup(0, 'C')} className={'btn btn-primary'}>Thêm mới
-                                sản phẩm</button>
+                            <h3>製品リスト</h3>
+                            <div className={'staff-home-middle-header-btn'}>
+                                <input ref={fileInputRef} hidden required type="file"
+                                       className="form-control" id="imageProduct" onChange={onExcelFileChange}/>
+                                <button style={{marginRight: '10px'}} className={'btn btn-success'}
+                                        onClick={handleUploadExcel}>Excelから新製品を追加します
+                                </button>
+                                <button onClick={() => handleShowModalCreatePopup(0, 'C')}
+                                        className={'btn btn-primary'}>新製品を追加します
+                                </button>
+                            </div>
                         </div>
 
                         <table className="table table-bordered">
@@ -127,7 +198,7 @@ function StaffHome() {
                                 <th scope="col">Mô tả sản phẩm</th>
                                 <th scope="col">Ảnh Sản Phẩm</th>
                                 <th scope="col">Trạng thái</th>
-                                <th scope="col">Hành động </th>
+                                <th scope="col">Hành động</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -144,10 +215,15 @@ function StaffHome() {
                                         <td>{product.quantity}</td>
                                         <td>{product.point}</td>
                                         <td>{product.description}</td>
-                                        <td><ImageProduct productId={product.productId ? product.productId : 0} actionModalCreateUpdate={actionModalCreateUpdate}/></td>
+                                        <td><ImageProduct productId={product.productId ? product.productId : 0}
+                                                          actionModalCreateUpdate={actionModalCreateUpdate}/></td>
                                         <td>{product.isDelete === true ? 'Đã xóa' : 'Đang kinh doanh'}</td>
                                         <td>
-                                            <button onClick={() => deleteProduct(product.productId ? product.productId : 0)} title={'Xóa sản phẩm'} className={'btn btn-danger'}><FontAwesomeIcon icon={faTrash}/></button></td>
+                                            <button
+                                                onClick={() => deleteProduct(product.productId ? product.productId : 0)}
+                                                title={'Xóa sản phẩm'} className={'btn btn-danger'}><FontAwesomeIcon
+                                                icon={faTrash}/></button>
+                                        </td>
                                     </tr>
                                 ))) : (
                                     <tr>
@@ -166,7 +242,7 @@ function StaffHome() {
                         </table>
                         {/* Nút phân trang */}
                         <div hidden={products.length === 0} className="pagination">
-                            {Array.from({ length: totalPages }, (_, index) => (
+                            {Array.from({length: totalPages}, (_, index) => (
                                 <button
                                     key={index + 1}
                                     onClick={() => setCurrentPage(index + 1)}
@@ -190,6 +266,11 @@ function StaffHome() {
                 showEditImageForm={showEditImageForm}
                 setShowEditImageForm={setShowEditImageForm}
                 setActionModalCreateUpdate={setActionModalCreateUpdate}
+            />
+            <ModalUploadProduct
+                show={showModalUploadProduct}
+                onHide={closeModalUpload}
+                dataupload={dataUpload}
             />
         </div>
     )

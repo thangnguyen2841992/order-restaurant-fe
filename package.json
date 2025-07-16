@@ -16,6 +16,7 @@
     "@types/react-dom": "^19.1.6",
     "bootstrap": "^5.3.7",
     "firebase": "^11.9.1",
+    "immer": "^10.1.1",
     "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",
@@ -24,7 +25,8 @@
     "react-scripts": "5.0.1",
     "sockjs-client": "^1.6.1",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",

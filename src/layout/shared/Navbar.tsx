@@ -46,10 +46,10 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
                 </button>
             </div>
             <div className={'navbar-area-action'}>
-                    <button id={'btnLikeProduct'}  title={'お気に入り'}>
+                    <button hidden={!getUserToken().isUser} id={'btnLikeProduct'}  title={'お気に入り'}>
                         <FontAwesomeIcon icon={faHeart}/>
                     </button>
-                    <div className={'cart-area'} onClick={() => handleShowHideCartArea(true)}>
+                    <div hidden={!getUserToken().isUser} className={'cart-area'} onClick={() => handleShowHideCartArea(true)}>
                         <button id={'btnCartProduct'} title={'ショッピングカート'}>
                             <FontAwesomeIcon icon={faShoppingCart}/>
                         </button>
