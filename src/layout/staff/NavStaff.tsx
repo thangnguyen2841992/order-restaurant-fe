@@ -35,7 +35,7 @@ const NavStaff: React.FC<NavStaffInterface> = ({handleChangeMenuStaff, handleCha
     return (
         <div className={'nav-staff'}>
             <div onClick={() => changeMenu('listProduct')} className="nav-staff-item">
-                Danh sách sản phẩm
+                製品リスト
             </div>
 
             <Dropdown onSelect={handleSelect}>
@@ -54,7 +54,7 @@ const NavStaff: React.FC<NavStaffInterface> = ({handleChangeMenuStaff, handleCha
             </Dropdown>
 
             <div onClick={() => changeMenu('user')} className="nav-staff-item">
-                Danh sách khách hàng
+                顧客リスト
             </div>
 
         </div>
