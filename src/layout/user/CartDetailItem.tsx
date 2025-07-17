@@ -6,10 +6,11 @@ import {getProductByProductIdUser} from "../../api/User-Api";
 interface CartDetailItemInterface {
     index: number;
     productId: number;
-    quantity : number;
-    editQuantity : (productId : number, type : number) => void;
+    quantity: number;
+    editQuantity: (productId: number, type: number) => void;
 }
-const CartDetailItem:React.FC<CartDetailItemInterface> = ({productId, quantity, index, editQuantity}) => {
+
+const CartDetailItem: React.FC<CartDetailItemInterface> = ({productId, quantity, index, editQuantity}) => {
     const [product, setProduct] = useState<Product>({});
     const [image, setImage] = useState<string>('');
 
@@ -27,42 +28,50 @@ const CartDetailItem:React.FC<CartDetailItemInterface> = ({productId, quantity, 
     }, [productId]);
 
 
+    return (
+        <div>
+            <div className="cart-detail-area-content-item">
+                <div className="cart-detail-area-content-item-index">
+                    {index + 1}
+                </div>
+                <div className="cart-detail-area-content-item-image">
+                    <img src={`data:image/jpeg;base64,${image}`} alt="Anh san pham"/>
+                </div>
+                <div className="cart-detail-area-content-item-name-price">
+                    <div className="cart-detail-area-content-item-name">
+                        {product.productName}
+                    </div>
+                    <div className="cart-detail-area-content-item-price">
+                        {product.productPrice?.toLocaleString()} <u>¥</u>
+                    </div>
+                </div>
 
-   return (
-       <div>
-           <div className="cart-detail-area-content-item">
-               <div className="cart-detail-area-content-item-index">
-                   {index + 1}
-               </div>
-               <div className="cart-detail-area-content-item-image">
-                   <img src={image} alt="Anh san pham"/>
-               </div>
-               <div className="cart-detail-area-content-item-name-price">
-                   <div className="cart-detail-area-content-item-name">
-                       {product.productName}
-                   </div>
-                   <div className="cart-detail-area-content-item-price">
-                       { product.productPrice?.toLocaleString()} <u>¥</u>
-                   </div>
-               </div>
+                <div className="cart-detail-area-content-item-quantity">
+                    <button onClick={() => editQuantity(product.productId ? product.productId : 0, 0)}>
+                        -
+                    </button>
+                    <div className={'product-quantity-cart'}>
+                        {quantity}
+                    </div>
+                    <button onClick={() => editQuantity(product.productId ? product.productId : 0, 1)}>
+                        +
+                    </button>
+                </div>
+                <div className="cart-detail-area-content-item-total">
+                    <div className="cart-detail-area-content-item-total-top">
+                            Thành tiền
+                    </div>
+                    <div className="cart-detail-area-content-item-total-bottom">
+                        {(Number(product.productPrice) * Number(quantity)).toLocaleString()} <u>¥</u>
+                    </div>
+                </div>
+                <div className="cart-detail-area-content-item-delete">
+                    Xóa
+                </div>
 
-               <div className="cart-detail-area-content-item-quantity">
-                   <button  onClick={() => editQuantity(product.productId ? product.productId : 0 , 0)}>
-                       -
-                   </button>
-                   <div className={'product-quantity-cart'}>
-                       {quantity}
-                   </div>
-                   <button onClick={() => editQuantity(product.productId ? product.productId : 0 , 1)}>
-                       +
-                   </button>
-               </div>
-               <div className="cart-detail-area-content-item-total">
+            </div>
 
-               </div>
-
-           </div>
-       </div>
-   )
+        </div>
+    )
 }
 export default CartDetailItem

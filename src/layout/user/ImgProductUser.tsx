@@ -21,7 +21,7 @@ const ImgProductUser: React.FC<ImgProductUserInterface> = ({productId}) => {
     if (images.length > 0) {
         return (
             <div className={'imgProductUser'}>
-                <img src={images[0].imageLink} alt="Ảnh sản phẩm"/>
+                <img  src={`data:image/jpeg;base64,${images[0].imageLink}`}  alt="Ảnh sản phẩm"/>
             </div>
         )
     } else {

@@ -159,7 +159,6 @@ function ModalCreateNewProduct(props: any) {
 
             if (response.ok) {
                 alert('Chỉnh sửa sản phẩm thành công');
-                // resetProductForm();
                 props.setActionModalCreateUpdate(true);
                 props.handleCloseModalCreatePopup();
             } else {
@@ -308,7 +307,7 @@ function ModalCreateNewProduct(props: any) {
                                     Chỉnh sửa hình ảnh
                                 </div>
                             </div>
-                            <Waiting isDone={processImg}/>
+                            <Waiting isDone={processImg} message={'Đang upload ảnh'}/>
                             <button onClick={props.type === 'C' ? handleSaveProduct : handleUpdateProduct}
                                     style={{width: '100%'}} className={'btn btn-primary'}>Lưu
                                 sản phẩm
@@ -326,7 +325,7 @@ function ModalCreateNewProduct(props: any) {
                                         </div>
                                     ))
                                 }
-                                <Waiting isDone={processImg}/>
+                                <Waiting isDone={processImg} message={'Đang upload ảnh'}/>
                             </div>
                             <div className="form-group">
                                 <input hidden required type="file" multiple

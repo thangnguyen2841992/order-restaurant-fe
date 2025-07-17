@@ -2,9 +2,10 @@ import React from 'react';
 
 interface WaitingProps {
     isDone?: boolean; // Có thể tùy chọn thông điệp
+    message: string;
 }
 
-const Waiting: React.FC<WaitingProps> = ({ isDone }) => {
+const Waiting: React.FC<WaitingProps> = ({ isDone, message }) => {
     return (
         <div hidden={!isDone} style={{
             display: 'flex',
@@ -13,7 +14,7 @@ const Waiting: React.FC<WaitingProps> = ({ isDone }) => {
             justifyContent: 'center',
         }}>
             <div style={styles.loader}></div>
-            <p>Đang upload ảnh</p>
+            <p>{message}</p>
             <style>{`
                 @keyframes spin {
                     0% { transform: rotate(0deg); }

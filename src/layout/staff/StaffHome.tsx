@@ -26,11 +26,19 @@ function StaffHome() {
     const [cartResponse, setCartResponse] = useState<CartResponse>({});
     const [test, setTest] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const fileInputRefEdit = useRef<HTMLInputElement | null>(null);
     const [showModalUploadProduct, setShowModalUploadProduct] = useState(false);
     const [dataUpload, setDataUpload] = useState<any[]>([]);
+    const [typeUpload, setTypeUpload] = useState<string>('create');
     const handleUploadExcel = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
+        }
+    };
+
+    const handleEditProductByExcel = () => {
+        if (fileInputRefEdit.current) {
+            fileInputRefEdit.current.click();
         }
     };
 
@@ -90,42 +98,51 @@ function StaffHome() {
         setShowModalUploadProduct(false);
     }
 
-    const onExcelFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const onExcelFileChange = (event: React.ChangeEvent<HTMLInputElement>, type : string) => {
         const file = event.target.files?.[0];
         if (file) {
             const fileType = file.type;
             if (fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
                 fileType === 'application/vnd.ms-excel') {
+                setTypeUpload(type);
                 setShowModalUploadProduct(true);
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const arrayBuffer = e.target?.result;
-                    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                    const workbook = XLSX.read(arrayBuffer, {type: 'array'});
 
                     // Lấy dữ liệu từ sheet đầu tiên
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
 
                     // Bỏ qua dòng tiêu đề đầu tiên
                     const dataWithoutHeader = jsonData.slice(1);
 
                     const productUploads = dataWithoutHeader.map((row: any) => {
-                        const imageLinks = row[7] ? row[7].split(',') : [];
-                        const newImages = imageLinks.map((link : string) => ({
-                            imageLink: link.trim(),
-                        }));
+                        if (type == 'create') {
+                            const imageLinks = row[7] ? row[7].split(',') : [];
+                            const newImages = imageLinks.map((link: string) => ({
+                                imageLink: link.trim(),
+                            }));
 
-                        return {
-                            brandId: row[0].charAt(0),
-                            productName: row[1],
-                            productPrice: row[2],
-                            productUnitId: row[3].charAt(0),
-                            quantity: row[4],
-                            point: row[5],
-                            description: row[6],
-                            imageList: newImages // Mảng các đối tượng Image
-                        };
+                            return {
+                                brandId: row[0].charAt(0),
+                                productName: row[1],
+                                productPrice: row[2],
+                                productUnitId: row[3].charAt(0),
+                                quantity: row[4],
+                                point: row[5],
+                                description: row[6],
+                                imageList: newImages // Mảng các đối tượng Image
+                            };
+                        } else {
+                            return {
+                                productId: row[0],
+                                productName : row[1],
+                                quantity: row[2]
+                            }
+                        }
                     });
 
                     console.log(productUploads);
@@ -137,7 +154,9 @@ function StaffHome() {
                 alert("Vui lòng chọn một file Excel (.xls hoặc .xlsx)!");
             }
         }
+        event.target.value = '';
     };
+
 
     useEffect(() => {
         getAllProducts().then((data) => {
@@ -176,7 +195,15 @@ function StaffHome() {
                             <h3>製品リスト</h3>
                             <div className={'staff-home-middle-header-btn'}>
                                 <input ref={fileInputRef} hidden required type="file"
-                                       className="form-control" id="imageProduct" onChange={onExcelFileChange}/>
+                                       className="form-control" id="imageProduct"
+                                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => onExcelFileChange(e, 'create')}/>
+
+                                <input ref={fileInputRefEdit} hidden required type="file"
+                                       className="form-control" id="imageProductEdit"
+                                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => onExcelFileChange(e, 'edit')}/>
+                                <button style={{marginRight: '10px'}} className={'btn btn-success'}
+                                        onClick={handleEditProductByExcel}>Excelファイルから製品の数量を更新する
+                                </button>
                                 <button style={{marginRight: '10px'}} className={'btn btn-success'}
                                         onClick={handleUploadExcel}>Excelから新製品を追加します
                                 </button>
@@ -184,6 +211,75 @@ function StaffHome() {
                                         className={'btn btn-primary'}>新製品を追加します
                                 </button>
                             </div>
+                        </div>
+
+                        {/* Nút phân trang */}
+                        <div hidden={products.length === 0} className="pagination">
+                            {totalPages > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => setCurrentPage(1)}
+                                        disabled={currentPage === 1}>
+                                        Trang đầu
+                                    </button>
+
+                                    <button
+                                        onClick={() => setCurrentPage(currentPage - 1)}
+                                        disabled={currentPage === 1}>
+                                        Previous
+                                    </button>
+
+                                    {currentPage > 3 && <span>...</span>}
+
+                                    {Array.from({length: Math.min(10, totalPages)}, (_, index) => {
+                                        const pageIndex = currentPage > 5
+                                            ? index + currentPage - 5
+                                            : index + 1;
+
+                                        if (pageIndex > totalPages) return null;
+
+                                        return (
+                                            <button
+                                                key={pageIndex}
+                                                onClick={() => setCurrentPage(pageIndex)}
+                                                disabled={pageIndex === currentPage}>
+                                                {pageIndex}
+                                            </button>
+                                        );
+                                    })}
+
+                                    {currentPage < totalPages - 2 && <span>...</span>}
+
+                                    <button
+                                        onClick={() => setCurrentPage(currentPage + 1)}
+                                        disabled={currentPage === totalPages}>
+                                        Next
+                                    </button>
+
+                                    <button
+                                        onClick={() => setCurrentPage(totalPages)}
+                                        disabled={currentPage === totalPages}>
+                                        Trang cuối
+                                    </button>
+                                    <input
+                                        type="text"
+                                        min={1}
+                                        max={totalPages}
+                                        placeholder="Nhập số trang"
+                                        onKeyPress={(e) => {
+                                            if (!/[0-9]/.test(e.key)) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        onChange={(e) => {
+                                            const page = Number(e.target.value);
+                                            if (page >= 1 && page <= totalPages) {
+                                                setCurrentPage(page);
+                                            }
+                                        }}
+                                    />
+                                </>
+                            )}
                         </div>
 
                         <table className="table table-bordered">
@@ -228,29 +324,20 @@ function StaffHome() {
                                 ))) : (
                                     <tr>
                                         <td style={{
+                                            // width:'100%',
                                             height: '300px',
                                             textAlign: 'center',
                                             verticalAlign: 'middle',
                                             fontSize: '18px',
                                             fontWeight: '500'
-                                        }} colSpan={8}>Không có sản phẩm nào
+                                        }} colSpan={10}>Không có sản phẩm nào
                                         </td>
                                     </tr>
                                 )
                             }
                             </tbody>
                         </table>
-                        {/* Nút phân trang */}
-                        <div hidden={products.length === 0} className="pagination">
-                            {Array.from({length: totalPages}, (_, index) => (
-                                <button
-                                    key={index + 1}
-                                    onClick={() => setCurrentPage(index + 1)}
-                                    disabled={index + 1 === currentPage}>
-                                    {index + 1}
-                                </button>
-                            ))}
-                        </div>
+
                     </div>
 
                 </div>
@@ -271,6 +358,8 @@ function StaffHome() {
                 show={showModalUploadProduct}
                 onHide={closeModalUpload}
                 dataupload={dataUpload}
+                setShowModalUploadProduct={setShowModalUploadProduct}
+                type={typeUpload}
             />
         </div>
     )

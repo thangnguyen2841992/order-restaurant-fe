@@ -33,6 +33,15 @@ function UserHome() {
     };
     const [client, setClient] = useState<Client | null>(null);
 
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const ITEMS_PER_PAGE = 10; // Số sản phẩm hiển thị mỗi trang
+    const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+// Lấy sản phẩm cho trang hiện tại
+    const displayedProducts = products.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
     const checkProductCartExist = (productId : number)  => {
         if (cartResults.productCartList === undefined) return 0;
         if (cartResults.productCartList.length > 0) {
@@ -46,6 +55,8 @@ function UserHome() {
     useEffect(() => {
         getCartResponseOfUserId().then((data) => {
             setCartResults(data);
+        }).catch((error) => {
+            console.log(error)
         })
     }, []);
 
@@ -67,7 +78,8 @@ function UserHome() {
                         cartId : cart.cartId,
                         dateCreated : cart.dateCreated,
                         productCartList : cart.productCartList,
-                        userId : cart.userId
+                        userId : cart.userId,
+                        totalPrice: cart.totalPrice
                     }
                     setCartResults(cartResponse);
                 });
@@ -152,9 +164,77 @@ function UserHome() {
                         </div>
                     </div>
                 </div>
+                 {/* Nút phân trang */}
+                 <div hidden={products.length === 0} className="pagination" style={showCartArea ? {pointerEvents : 'none', opacity : '0.4'} : {pointerEvents : 'auto', opacity : '1'}}>
+                     {totalPages > 1 && (
+                         <>
+                             <button
+                                 onClick={() => setCurrentPage(1)}
+                                 disabled={currentPage === 1}>
+                                 Trang đầu
+                             </button>
+
+                             <button
+                                 onClick={() => setCurrentPage(currentPage - 1)}
+                                 disabled={currentPage === 1}>
+                                 Previous
+                             </button>
+
+                             {currentPage > 3 && <span>...</span>}
+
+                             {Array.from({length: Math.min(10, totalPages)}, (_, index) => {
+                                 const pageIndex = currentPage > 5
+                                     ? index + currentPage - 5
+                                     : index + 1;
+
+                                 if (pageIndex > totalPages) return null;
+
+                                 return (
+                                     <button
+                                         key={pageIndex}
+                                         onClick={() => setCurrentPage(pageIndex)}
+                                         disabled={pageIndex === currentPage}>
+                                         {pageIndex}
+                                     </button>
+                                 );
+                             })}
+
+                             {currentPage < totalPages - 2 && <span>...</span>}
+
+                             <button
+                                 onClick={() => setCurrentPage(currentPage + 1)}
+                                 disabled={currentPage === totalPages}>
+                                 Next
+                             </button>
+
+                             <button
+                                 onClick={() => setCurrentPage(totalPages)}
+                                 disabled={currentPage === totalPages}>
+                                 Trang cuối
+                             </button>
+                             <input
+                                 type="text"
+                                 min={1}
+                                 max={totalPages}
+                                 placeholder="Nhập số trang"
+                                 onKeyPress={(e) => {
+                                     if (!/[0-9]/.test(e.key)) {
+                                         e.preventDefault();
+                                     }
+                                 }}
+                                 onChange={(e) => {
+                                     const page = Number(e.target.value);
+                                     if (page >= 1 && page <= totalPages) {
+                                         setCurrentPage(page);
+                                     }
+                                 }}
+                             />
+                         </>
+                     )}
+                 </div>
                  <div style={showCartArea ? {pointerEvents : 'none', opacity : '0.4'} : {pointerEvents : 'auto', opacity : '1'}} className="user-home-middle">
                      {
-                         products.map((product) => (
+                         displayedProducts.map((product) => (
                              <div key={product.productId} className="user-home-middle-item">
                                  <div className="user-home-middle-item-img">
                                      <ImgProductUser productId={product.productId ? product.productId : 0}/>
@@ -219,11 +299,25 @@ function UserHome() {
                 <div className="cart-detail-area-content">
                     {
                         cartResults.productCartList?.map((product, index) => (
-                            <CartDetailItem  productId={product.productId ? product.productId : 0} quantity={product.quantity ? product.quantity : 0} key={product.productId} index={index}  editQuantity={editQuantity}/>
+                            <CartDetailItem  productId={product.productId ? product.productId : 0} quantity={product.quantity ? product.quantity : 0} key={product.productId} index={index}  editQuantity={editQuantity} />
                         ))
                     }
 
                 </div>
+                <div className="cart-detail-bottom">
+                    <div className="cart-detail-bottom-left">
+                        Xóa tất cả
+                    </div>
+                    <div className="cart-detail-bottom-right">
+                        <div className="cart-detail-bottom-right-left">
+                            Thành tiền:
+                        </div>
+                        <div className="cart-detail-bottom-right-right">
+                            ${(Number(cartResults.totalPrice)).toLocaleString()} <u>¥</u>
+                        </div>
+                    </div>
+                </div>
+                <button id={'see-cart'} className={'btn btn-primary'}>Xem giỏ hàng</button>
             </div>
         </div>
     )

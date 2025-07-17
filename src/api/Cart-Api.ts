@@ -18,7 +18,7 @@ export async function getCartResponseOfUserId(): Promise<CartResponse> {
         cartId: responseData.cartId,
         userId: responseData.userId,
         productCartList: responseData.productCartList,
-        dateCreated: responseData.dateCreated
-
+        dateCreated: responseData.dateCreated,
+        totalPrice: responseData.totalPrice
     };
 }

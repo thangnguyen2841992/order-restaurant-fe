@@ -9,7 +9,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000; /* Đảm bảo navbar nằm trên các phần tử khác */
+    z-index: 3000; /* Đảm bảo navbar nằm trên các phần tử khác */
 
 }
 
@@ -188,7 +188,6 @@
 .admin-home-middle-header, .staff-home-middle-header {
     font-weight: bold;
     font-size: 20px;
-    margin: 20px 0;
     color: black;
 }
 
@@ -597,7 +596,7 @@ td {
     top: 80px;
     right: 0;
     width: 50%;
-    height: 700px;
+    height: 80vh;
     z-index: 2000;
     background-color: #fff;
     padding: 20px;
@@ -634,7 +633,7 @@ td {
 }
 .cart-detail-area-content {
     min-height: 280px;
-    max-height: 500px;
+    max-height: 52vh;
     margin-top: 20px;
     border-radius: 10px;
     padding: 10px 10px;
@@ -653,7 +652,7 @@ td {
     justify-content: space-between;
 }
 .cart-detail-area-content-item-name-price {
-    width: 50%;
+    width: 40%;
 }
 .cart-detail-area-content-item-quantity {
     width: 20%;
@@ -662,7 +661,33 @@ td {
     justify-content: space-between;
 }
 .cart-detail-area-content-item-total {
-    width: 15%;
+    width: 20%;
+    margin-left: 10px;
+}
+.cart-detail-area-content-item-delete {
+    width: 5%;
+    color: #005c98;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 17px;
+    cursor: pointer;
+}
+.cart-detail-bottom-left {
+    color: #005c98;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 17px;
+    cursor: pointer;
+}
+.cart-detail-area-content-item-total-top {
+    color : #7a7e80;
+    font-size: 14px;
+    font-weight: 400;
+}
+.cart-detail-area-content-item-total-bottom {
+    color : #e82230;
+    font-weight: bold;
+    font-size: 16px;
 }
 .cart-detail-area-content-item-image {
     width: 100px;
@@ -692,4 +717,32 @@ td {
 .product-quantity-cart {
     color: white;
     font-weight: 500;
+}
+.pagination {
+    margin-bottom: 10px;
+}
+.cart-detail-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+.cart-detail-bottom-right {
+    display: flex;
+    align-items: center;
+}
+.cart-detail-bottom-right-left {
+    font-size: 20px;
+    color: #000;
+    font-weight: bold;
+    margin-right: 5px;
+}
+.cart-detail-bottom-right-right {
+    font-size: 20px;
+    color: #e82230;
+    font-weight: bold;
+}
+#see-cart {
+    font-size: 18px;
+    width: 100%;
 }
