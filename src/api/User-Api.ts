@@ -1,16 +1,10 @@
 import Product from "../model/Product";
 import {myRequestToken} from "./Public-Api";
 
-const token = localStorage.getItem("token");
-
 export async function getAllProductsUser(): Promise<Product[]> {
     let url: string = `http://localhost:8083/user-api/getAllProducts`;
 
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
 
     let products: Product[] = [];
 
@@ -49,11 +43,7 @@ const calculateDiscountedPrice = (price: number): { discountedPrice: number; dis
 export async function getProductByProductIdUser(productId: number): Promise<Product> {
     let url: string = `http://localhost:8083/user-api/getProductById?productId=${productId}`;
 
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
 
     return {
         productId: responseData.productId,

@@ -4,14 +4,7 @@ import ProductUnit from "../model/ProductUnit";
 export async function getAllProductUnits(): Promise<ProductUnit[]> {
     const  url = `http://localhost:8083/product-unit-api/getAll`;
 
-    const token = localStorage.getItem("token");
-
-
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
 
     let productUnits: ProductUnit[] = [];
 

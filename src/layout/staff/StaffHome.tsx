@@ -160,14 +160,6 @@ function StaffHome() {
 
 
     useEffect(() => {
-        getAllProducts().then((data) => {
-            setProducts(data);
-        }).catch((error) => {
-            console.log(error);
-        })
-    }, []);
-
-    useEffect(() => {
         if (Number(brandId) !== 0) {
             getAllProductsOfBrand(brandId).then((data) => {
                 setProducts(data);

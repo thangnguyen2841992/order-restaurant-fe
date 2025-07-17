@@ -1,16 +1,11 @@
 import {myRequestToken} from "./Public-Api";
 import Product from "../model/Product";
 
-const token = localStorage.getItem("token");
-
 export async function getAllProducts(): Promise<Product[]> {
     let url: string = `http://localhost:8083/staff-api/getAllProducts`;
 
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
+
 
     let products: Product[] = [];
 
@@ -38,11 +33,7 @@ export async function getAllProducts(): Promise<Product[]> {
 export async function getAllProductsOfBrand(brandId: number): Promise<Product[]> {
     let url: string = `http://localhost:8083/staff-api/getAllProductsOfBrand?brandId=${brandId}`;
 
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
 
     let products: Product[] = [];
 
@@ -70,11 +61,7 @@ export async function getAllProductsOfBrand(brandId: number): Promise<Product[]>
 export async function getProductByProductId(productId: number): Promise<Product> {
     let url: string = `http://localhost:8083/staff-api/getProductById?productId=${productId}`;
 
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
 
     return {
         productId: responseData.productId,

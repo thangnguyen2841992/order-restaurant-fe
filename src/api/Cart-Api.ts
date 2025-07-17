@@ -5,14 +5,7 @@ export async function getCartResponseOfUserId(): Promise<CartResponse> {
     const userTokenId = getUserToken().userId;
     const url = `http://localhost:8083/cart-api/getAllProductCartOfUserId?userId=${userTokenId}`;
 
-    const token = localStorage.getItem("token");
-
-
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
 
     return {
         cartId: responseData.cartId,

@@ -21,7 +21,14 @@ export async function myRequest(url: string) {
 }
 
 export async function myRequestToken(url: string, options?: RequestInit) {
-    const fetchOptions = options ? options : {};
+    const fetchOptions = {
+        ...options,
+        headers: {
+            ...options?.headers,
+            'Authorization': `Bearer ${localStorage.getItem('token')}`, // Thêm token vào header
+            'Content-Type': 'application/json',
+        },
+    };
 
     const response = await fetch(url, fetchOptions);
 

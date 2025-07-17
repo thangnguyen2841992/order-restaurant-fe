@@ -8,14 +8,8 @@ export async function getAllUsers(type: string): Promise<User[]> {
     } else if (type === 'staff') {
         url = `http://localhost:8082/admin-api/getAllStaff`;
     }
-    const token = localStorage.getItem("token");
 
-
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
 
     let users: User[] = [];
 

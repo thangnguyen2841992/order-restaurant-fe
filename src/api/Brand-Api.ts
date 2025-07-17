@@ -4,14 +4,7 @@ import Brand from "../model/Brand";
 export async function getAllBrands(): Promise<Brand[]> {
     const  url = `http://localhost:8083/brand-api/getAllBrands`;
 
-    const token = localStorage.getItem("token");
-
-
-    const responseData = await myRequestToken(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    const responseData = await myRequestToken(url);
 
     let brands: Brand[] = [];
 
