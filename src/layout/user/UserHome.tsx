@@ -31,7 +31,7 @@ function UserHome() {
     const handleChangeBrandIdSelect = (value: string) => {
         setBrandId(Number(value));
     };
-    const [client, setClient] = useState<Client | null>(null);
+    const [client, setClient] = useState<Client>();
 
     const [currentPage, setCurrentPage] = useState<number>(1);
     const ITEMS_PER_PAGE = 10; // Số sản phẩm hiển thị mỗi trang
@@ -140,6 +140,18 @@ function UserHome() {
             client.publish({
                 destination: '/app/edit-quantity',
                 body: messageEditQuantitySend
+            });
+        }
+    }
+
+    const deleteAllProductOfCart = (cartId : number) => {
+        if (client) {
+            let messageDeleteAllProductOfCartSend =  JSON.stringify({
+                cartId : cartId,
+            })
+            client.publish({
+                destination: '/app/deleteAllProductCart',
+                body: messageDeleteAllProductOfCartSend
             });
         }
     }
@@ -298,14 +310,23 @@ function UserHome() {
                 </div>
                 <div className="cart-detail-area-content">
                     {
+                        (cartResults.productCartList && cartResults.productCartList.length > 0) ?
                         cartResults.productCartList?.map((product, index) => (
-                            <CartDetailItem  productId={product.productId ? product.productId : 0} quantity={product.quantity ? product.quantity : 0} key={product.productId} index={index}  editQuantity={editQuantity} />
+
+                            <CartDetailItem client={client ? client : new Client()}  productId={product.productId ? product.productId : 0} quantity={product.quantity ? product.quantity : 0} key={product.productId} index={index}  editQuantity={editQuantity} productCartId={Number(product.productCartId)} />
                         ))
+                        :
+                        (<div className={'no-content'}>
+                            <img src="https://cdn-b2c.mmpro.vn/cart-empty-qDN.svg" alt=""/>
+                            <div className="no-content-text">
+                                Không có sản phẩm nào trong giỏ hàng
+                            </div>
+                        </div>)
                     }
 
                 </div>
-                <div className="cart-detail-bottom">
-                    <div className="cart-detail-bottom-left">
+                <div hidden={(!cartResults.productCartList || cartResults.productCartList.length  === 0)} className="cart-detail-bottom">
+                    <div className="cart-detail-bottom-left" onClick={() => deleteAllProductOfCart(Number(cartResults.cartId))}>
                         Xóa tất cả
                     </div>
                     <div className="cart-detail-bottom-right">
@@ -317,7 +338,7 @@ function UserHome() {
                         </div>
                     </div>
                 </div>
-                <button id={'see-cart'} className={'btn btn-primary'}>Xem giỏ hàng</button>
+                <button hidden={(!cartResults.productCartList || cartResults.productCartList.length  === 0)} id={'see-cart'} className={'btn btn-primary'}>Xem giỏ hàng</button>
             </div>
         </div>
     )

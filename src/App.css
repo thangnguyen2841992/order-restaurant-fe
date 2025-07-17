@@ -596,7 +596,8 @@ td {
     top: 80px;
     right: 0;
     width: 50%;
-    height: 80vh;
+    min-height: 50vh;
+    max-height: 80vh;
     z-index: 2000;
     background-color: #fff;
     padding: 20px;
@@ -745,4 +746,18 @@ td {
 #see-cart {
     font-size: 18px;
     width: 100%;
+}
+.no-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.no-content img {
+    width: 150px;
+    height: 150px;
+}
+.no-content-text {
+    font-size: 18px;
+    font-weight: 500;
 }

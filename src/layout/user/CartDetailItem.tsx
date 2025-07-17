@@ -2,15 +2,18 @@ import React, {useEffect, useState} from "react";
 import Product from "../../model/Product";
 import {getAllImagesOfProductId} from "../../api/Image-Api";
 import {getProductByProductIdUser} from "../../api/User-Api";
+import {Client} from "@stomp/stompjs";
 
 interface CartDetailItemInterface {
     index: number;
     productId: number;
+    productCartId: number;
     quantity: number;
     editQuantity: (productId: number, type: number) => void;
+    client : Client;
 }
 
-const CartDetailItem: React.FC<CartDetailItemInterface> = ({productId, quantity, index, editQuantity}) => {
+const CartDetailItem: React.FC<CartDetailItemInterface> = ({productCartId,productId, quantity, index, editQuantity, client}) => {
     const [product, setProduct] = useState<Product>({});
     const [image, setImage] = useState<string>('');
 
@@ -27,6 +30,17 @@ const CartDetailItem: React.FC<CartDetailItemInterface> = ({productId, quantity,
         })
     }, [productId]);
 
+    const removeProductCart = (productCartId : number) => {
+        if (client) {
+            let messageDeleteProductCartSend =  JSON.stringify({
+                productCartId : productCartId,
+            })
+            client.publish({
+                destination: '/app/delete-product-cart',
+                body: messageDeleteProductCartSend
+            });
+        }
+    }
 
     return (
         <div>
@@ -65,7 +79,7 @@ const CartDetailItem: React.FC<CartDetailItemInterface> = ({productId, quantity,
                         {(Number(product.productPrice) * Number(quantity)).toLocaleString()} <u>¥</u>
                     </div>
                 </div>
-                <div className="cart-detail-area-content-item-delete">
+                <div className="cart-detail-area-content-item-delete" onClick={() => removeProductCart(productCartId)}>
                     Xóa
                 </div>
 
