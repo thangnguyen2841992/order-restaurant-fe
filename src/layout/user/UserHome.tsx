@@ -159,7 +159,7 @@ function UserHome() {
     return (
         <div className={'user-home-area'}>
             <Navbar cartResponse={cartResults} handleShowHideCartArea={setShowCartArea}/>
-             <div className="user-home-content">
+             <div onClick={() => setShowCartArea(false)} className="user-home-content">
              <NavUser handleChangeMenuUser={handleChangeMenuUser} handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
                 <div className="user-home-header">
                     <div className="user-home-header-top">
@@ -244,7 +244,7 @@ function UserHome() {
                          </>
                      )}
                  </div>
-                 <div style={showCartArea ? {pointerEvents : 'none', opacity : '0.4'} : {pointerEvents : 'auto', opacity : '1'}} className="user-home-middle">
+                 <div style={showCartArea ? {pointerEvents : 'none', opacity : '0.4'} : {pointerEvents : 'auto', opacity : '1'}} className="user-home-middle" >
                      {
                          displayedProducts.map((product) => (
                              <div key={product.productId} className="user-home-middle-item">
