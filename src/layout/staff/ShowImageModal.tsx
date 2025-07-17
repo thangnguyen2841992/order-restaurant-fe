@@ -39,7 +39,7 @@ function ShowImageModal(props: any) {
                                     </svg>
 
                                 </button>
-                                <img style={{cursor: 'pointer'}} src={props.images[props.currentIndex].imageLink} alt=""/>
+                                <img style={{cursor: 'pointer'}} src={`data:image/jpeg;base64,${props.images[props.currentIndex].imageLink}`}  alt=""/>
                                 <button className={'next-image'}  title={'Next'} hidden={props.images.length === 1 || props.currentIndex === props.images.length - 1}
                                   onClick={nextImage} disabled={props.images.length <= 1}>
 

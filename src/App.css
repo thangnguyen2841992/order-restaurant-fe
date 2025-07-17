@@ -566,7 +566,7 @@ td {
     align-items: center;
     font-size: 12px;
 }
-.edit-quantity-product {
+.edit-quantity-product,.cart-detail-area-content-item-quantity {
     background-color: #0272BA;
     border-radius: 30px;
     width: 150px;
@@ -576,7 +576,7 @@ td {
     align-items: center;
     padding: 0 10px;
 }
-.edit-quantity-product button {
+.edit-quantity-product button , .cart-detail-area-content-item-quantity button {
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -597,10 +597,12 @@ td {
     top: 80px;
     right: 0;
     width: 50%;
-    height: 500px;
+    height: 700px;
     z-index: 2000;
     background-color: #fff;
     padding: 20px;
+    box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.5); /* Đổ bóng */
+
 }
 .cart-detail-area-header {
     display: flex;
@@ -631,7 +633,8 @@ td {
     margin-right: 5px;
 }
 .cart-detail-area-content {
-    height: 300px;
+    min-height: 280px;
+    max-height: 500px;
     margin-top: 20px;
     border-radius: 10px;
     padding: 10px 10px;
@@ -645,5 +648,48 @@ td {
     margin-bottom:  10px;
     padding: 0 20px;
     border-radius: 10px;
+    align-items : center;
+    width: 100%;
+    justify-content: space-between;
+}
+.cart-detail-area-content-item-name-price {
+    width: 50%;
+}
+.cart-detail-area-content-item-quantity {
+    width: 20%;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+}
+.cart-detail-area-content-item-total {
+    width: 15%;
+}
+.cart-detail-area-content-item-image {
+    width: 100px;
+    height: 100%;
+    margin-right: 20px;
+
+}
+.cart-detail-area-content-item-image img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+.cart-detail-area-content-item-index {
+    width: 5%;
+    padding: 5px;
+    background-color: #f2f2f2;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+    margin-right: 10px;
+
+}
+.cart-detail-area-content-item-price {
+    font-weight: bold;
+}
+.product-quantity-cart {
+    color: white;
+    font-weight: 500;
 }

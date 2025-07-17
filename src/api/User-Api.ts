@@ -44,3 +44,28 @@ const calculateDiscountedPrice = (price: number): { discountedPrice: number; dis
     const discountedPrice = price + discountAmount;
     return {discountedPrice, discountPercentage};
 };
+
+
+export async function getProductByProductIdUser(productId: number): Promise<Product> {
+    let url: string = `http://localhost:8083/user-api/getProductById?productId=${productId}`;
+
+    const responseData = await myRequestToken(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    return {
+        productId: responseData.productId,
+        productName: responseData.productName,
+        productPrice: responseData.productPrice,
+        description: responseData.description,
+        dateCreated: responseData.dateCreated,
+        quantity: responseData.quantity,
+        point: responseData.point,
+        brand: responseData.brand,
+        productUnit: responseData.productUnit,
+        isDelete: responseData.delete
+
+    };
+}
