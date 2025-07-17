@@ -26,6 +26,7 @@ function ModalUploadProduct(props: any) {
                 setProcessUpload(false);
                 alert(messageSuccess);
                 props.setShowModalUploadProduct(false);
+                props.setActionModalCreateUpdate(true);
             } else {
                 setProcessUpload(false);
                 console.log(response.json());

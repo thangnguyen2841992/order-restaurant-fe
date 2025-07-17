@@ -116,36 +116,37 @@ function StaffHome() {
                     const worksheet = workbook.Sheets[firstSheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
 
-                    // Bỏ qua dòng tiêu đề đầu tiên
-                    const dataWithoutHeader = jsonData.slice(1);
+                    const dataWithoutHeader = jsonData.slice(1).filter((row : any) => row && row.length > 0);
 
                     const productUploads = dataWithoutHeader.map((row: any) => {
-                        if (type == 'create') {
-                            const imageLinks = row[7] ? row[7].split(',') : [];
-                            const newImages = imageLinks.map((link: string) => ({
-                                imageLink: link.trim(),
-                            }));
+                        if (row && row.length > 0 ) {
+                            if (type == 'create') {
+                                const imageLinks = row[7] ? row[7].split(',') : [];
+                                const newImages = imageLinks.map((link: string) => ({
+                                    imageLink: link.trim(),
+                                }));
 
-                            return {
-                                brandId: row[0].charAt(0),
-                                productName: row[1],
-                                productPrice: row[2],
-                                productUnitId: row[3].charAt(0),
-                                quantity: row[4],
-                                point: row[5],
-                                description: row[6],
-                                imageList: newImages // Mảng các đối tượng Image
-                            };
-                        } else {
-                            return {
-                                productId: row[0],
-                                productName : row[1],
-                                quantity: row[2]
+                                return {
+                                    brandId: row[0].charAt(0),
+                                    productName: row[1],
+                                    productPrice: row[2],
+                                    productUnitId: row[3].charAt(0),
+                                    quantity: row[4],
+                                    point: row[5],
+                                    description: row[6],
+                                    imageList: newImages // Mảng các đối tượng Image
+                                };
+                            } else {
+                                return {
+                                    productId: row[0],
+                                    productName : row[1],
+                                    quantity: row[2]
+                                }
                             }
                         }
+
                     });
 
-                    console.log(productUploads);
                     setDataUpload(productUploads); // Lưu dữ liệu vào state
                 };
 
@@ -360,6 +361,7 @@ function StaffHome() {
                 dataupload={dataUpload}
                 setShowModalUploadProduct={setShowModalUploadProduct}
                 type={typeUpload}
+                setActionModalCreateUpdate={setActionModalCreateUpdate}
             />
         </div>
     )
