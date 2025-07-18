@@ -36,7 +36,7 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
 
     return (
         <div className={'navbar-area'}>
-            <div className="navbar-area-logo">
+            <div onClick={() => navigate('/user/home')} className="navbar-area-logo">
                 <img src={'/logo3-removebg-preview.png'} alt=""/>
             </div>
             <div className="navbar-area-search">

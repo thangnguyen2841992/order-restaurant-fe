@@ -14,6 +14,8 @@ import {getUserToken} from "../../api/Public-Api";
 import CartResponse from "../../model/CartResponse";
 import {getCartResponseOfUserId} from "../../api/Cart-Api";
 import CartDetailItem from "./CartDetailItem";
+import CartScreen from "./CartScreen";
+import {useNavigate} from "react-router-dom";
 
 
 function UserHome() {
@@ -24,6 +26,9 @@ function UserHome() {
     const [cartResults, setCartResults] = useState<CartResponse>({});
     const userTokenId = getUserToken().userId;
     const [showCartArea, setShowCartArea] = useState(false);
+    const [showCartScreen, setShowCartScreen] = useState(false);
+    const navigate = useNavigate();
+
 
     const handleChangeMenuUser = (value: string) => {
         setMenuStaff(value);
@@ -42,7 +47,7 @@ function UserHome() {
         currentPage * ITEMS_PER_PAGE
     );
 
-    const checkProductCartExist = (productId : number)  => {
+    const checkProductCartExist = (productId: number) => {
         if (cartResults.productCartList === undefined) return 0;
         if (cartResults.productCartList.length > 0) {
             for (const productCart of cartResults.productCartList) {
@@ -74,11 +79,11 @@ function UserHome() {
                 stompClient.subscribe('/topic/cart', (message) => {
                     const cart = JSON.parse(message.body);
                     console.log(cart);
-                    const cartResponse : CartResponse = {
-                        cartId : cart.cartId,
-                        dateCreated : cart.dateCreated,
-                        productCartList : cart.productCartList,
-                        userId : cart.userId,
+                    const cartResponse: CartResponse = {
+                        cartId: cart.cartId,
+                        dateCreated: cart.dateCreated,
+                        productCartList: cart.productCartList,
+                        userId: cart.userId,
                         totalPrice: cart.totalPrice
                     }
                     setCartResults(cartResponse);
@@ -113,13 +118,13 @@ function UserHome() {
         }
     }, [brandId])
 
-    const addCart = (productId : number) => {
+    const addCart = (productId: number) => {
         if (client) {
-            let messageCartSend =  JSON.stringify({
-                userId : userTokenId,
-                product : {
-                    productId : productId,
-                    quantity : 1
+            let messageCartSend = JSON.stringify({
+                userId: userTokenId,
+                product: {
+                    productId: productId,
+                    quantity: 1
                 }
             })
             client.publish({
@@ -129,11 +134,11 @@ function UserHome() {
         }
     }
 
-    const editQuantity = (productId : number, type : number) => {
+    const editQuantity = (productId: number, type: number) => {
         if (client) {
-            let messageEditQuantitySend =  JSON.stringify({
-                userId : userTokenId,
-                productId : productId,
+            let messageEditQuantitySend = JSON.stringify({
+                userId: userTokenId,
+                productId: productId,
                 quantity: type
 
             })
@@ -144,10 +149,10 @@ function UserHome() {
         }
     }
 
-    const deleteAllProductOfCart = (cartId : number) => {
+    const deleteAllProductOfCart = (cartId: number) => {
         if (client) {
-            let messageDeleteAllProductOfCartSend =  JSON.stringify({
-                cartId : cartId,
+            let messageDeleteAllProductOfCartSend = JSON.stringify({
+                cartId: cartId,
             })
             client.publish({
                 destination: '/app/deleteAllProductCart',
@@ -159,135 +164,183 @@ function UserHome() {
     return (
         <div className={'user-home-area'}>
             <Navbar cartResponse={cartResults} handleShowHideCartArea={setShowCartArea}/>
-             <div onClick={() => setShowCartArea(false)} className="user-home-content">
-             <NavUser handleChangeMenuUser={handleChangeMenuUser} handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
-                <div className="user-home-header">
-                    <div className="user-home-header-top">
-                        <div className={'user-home-header-top-home'}>家</div>
-                        <div>{'>'}</div>
-                        <div className={'user-home-header-top-brand-name'}>{brandName}</div>
-                    </div>
-                    <div className="user-home-header-bottom">
-                        <div className="user-home-header-bottom-left">
-                            {brandName}
+            <div onClick={() => setShowCartArea(false)} className="user-home-content">
+                <NavUser handleChangeMenuUser={handleChangeMenuUser}
+                         handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
+                <div hidden={showCartScreen} className={'user-home-detail'}>
+                    <div className="user-home-header">
+                        <div className="user-home-header-top">
+                            <div className={'user-home-header-top-home'}>家</div>
+                            <div>{'>'}</div>
+                            <div className={'user-home-header-top-brand-name'}>{brandName}</div>
                         </div>
-                        <div className="user-home-header-bottom-right">
-                            1210 製品
+                        <div className="user-home-header-bottom">
+                            <div className="user-home-header-bottom-left">
+                                {brandName}
+                            </div>
+                            <div className="user-home-header-bottom-right">
+                                1210 製品
+                            </div>
                         </div>
                     </div>
+                    {/* Nút phân trang */}
+                    <div hidden={products.length === 0} className="pagination"
+                         style={showCartArea ? {pointerEvents: 'none', opacity: '0.4'} : {
+                             pointerEvents: 'auto',
+                             opacity: '1'
+                         }}>
+                        {totalPages > 1 && (
+                            <>
+                                <button
+                                    onClick={() => setCurrentPage(1)}
+                                    disabled={currentPage === 1}>
+                                    Trang đầu
+                                </button>
+
+                                <button
+                                    onClick={() => setCurrentPage(currentPage - 1)}
+                                    disabled={currentPage === 1}>
+                                    Previous
+                                </button>
+
+                                {currentPage > 3 && <span>...</span>}
+
+                                {Array.from({length: Math.min(10, totalPages)}, (_, index) => {
+                                    const pageIndex = currentPage > 5
+                                        ? index + currentPage - 5
+                                        : index + 1;
+
+                                    if (pageIndex > totalPages) return null;
+
+                                    return (
+                                        <button
+                                            key={pageIndex}
+                                            onClick={() => setCurrentPage(pageIndex)}
+                                            disabled={pageIndex === currentPage}>
+                                            {pageIndex}
+                                        </button>
+                                    );
+                                })}
+
+                                {currentPage < totalPages - 2 && <span>...</span>}
+
+                                <button
+                                    onClick={() => setCurrentPage(currentPage + 1)}
+                                    disabled={currentPage === totalPages}>
+                                    Next
+                                </button>
+
+                                <button
+                                    onClick={() => setCurrentPage(totalPages)}
+                                    disabled={currentPage === totalPages}>
+                                    Trang cuối
+                                </button>
+                                <input
+                                    type="text"
+                                    min={1}
+                                    max={totalPages}
+                                    placeholder="Nhập số trang"
+                                    onKeyPress={(e) => {
+                                        if (!/[0-9]/.test(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    onChange={(e) => {
+                                        const page = Number(e.target.value);
+                                        if (page >= 1 && page <= totalPages) {
+                                            setCurrentPage(page);
+                                        }
+                                    }}
+                                />
+                            </>
+                        )}
+                    </div>
+                    <div style={showCartArea ? {pointerEvents: 'none', opacity: '0.4'} : {
+                        pointerEvents: 'auto',
+                        opacity: '1'
+                    }} className="user-home-middle">
+                        {
+                            displayedProducts.map((product) => (
+                                <div key={product.productId} className="user-home-middle-item">
+                                    <div className="user-home-middle-item-img">
+                                        <ImgProductUser productId={product.productId ? product.productId : 0}/>
+                                    </div>
+                                    <div className="user-home-middle-item-price">
+                                        {product.productPrice?.toLocaleString()}
+                                        <u>¥</u> / {product.productUnit?.productUnitName}
+                                    </div>
+                                    <div className="user-home-middle-item-price-origin">
+                                        <PriceOriginComponent
+                                            price={product.productOriginalPrice ? product.productOriginalPrice : 1000}
+                                            percent={product.productPercent ? product.productPercent : 0}/>
+                                    </div>
+                                    <div className="user-home-middle-item-productNm">
+                                        {product.productName}
+                                    </div>
+                                    <div className="user-home-middle-item-button">
+                                        <button
+                                            style={checkProductCartExist(product.productId ? product.productId : 0) == 0 ? {marginRight: '55%'} : {marginRight: '12%'}}
+                                            title={'お気に入りのリストを追加します'} type={'button'}
+                                            className={'btn-like-product'}><FontAwesomeIcon icon={faHeart}/></button>
+                                        <div
+                                            hidden={checkProductCartExist(product.productId ? product.productId : 0) == 0}
+                                            className={'edit-quantity-product'}>
+                                            <button
+                                                onClick={() => editQuantity(product.productId ? product.productId : 0, 0)}>
+                                                -
+                                            </button>
+                                            <div className={'productQuantity'}>
+                                                {checkProductCartExist(product.productId ? product.productId : 0)}
+                                            </div>
+                                            <button
+                                                onClick={() => editQuantity(product.productId ? product.productId : 0, 1)}>
+                                                +
+                                            </button>
+                                        </div>
+                                        <button
+                                            hidden={checkProductCartExist(product.productId ? product.productId : 0) != 0}
+                                            title={'カートに追加します'}
+                                            onClick={() => addCart(product.productId ? product.productId : 0)}
+                                            type={'button'} className={'btn btn-danger'}><FontAwesomeIcon
+                                            icon={faShoppingCart}/></button>
+                                    </div>
+                                    <div hidden={product.point == 0} className="user-home-middle-item-point-area">
+                                        <div className="user-home-middle-item-point">
+                                            x{product.point}
+                                        </div>
+                                        <div className="user-home-middle-item-point-des">
+                                            ポイント
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        }
+                    </div>
+
                 </div>
-                 {/* Nút phân trang */}
-                 <div hidden={products.length === 0} className="pagination" style={showCartArea ? {pointerEvents : 'none', opacity : '0.4'} : {pointerEvents : 'auto', opacity : '1'}}>
-                     {totalPages > 1 && (
-                         <>
-                             <button
-                                 onClick={() => setCurrentPage(1)}
-                                 disabled={currentPage === 1}>
-                                 Trang đầu
-                             </button>
-
-                             <button
-                                 onClick={() => setCurrentPage(currentPage - 1)}
-                                 disabled={currentPage === 1}>
-                                 Previous
-                             </button>
-
-                             {currentPage > 3 && <span>...</span>}
-
-                             {Array.from({length: Math.min(10, totalPages)}, (_, index) => {
-                                 const pageIndex = currentPage > 5
-                                     ? index + currentPage - 5
-                                     : index + 1;
-
-                                 if (pageIndex > totalPages) return null;
-
-                                 return (
-                                     <button
-                                         key={pageIndex}
-                                         onClick={() => setCurrentPage(pageIndex)}
-                                         disabled={pageIndex === currentPage}>
-                                         {pageIndex}
-                                     </button>
-                                 );
-                             })}
-
-                             {currentPage < totalPages - 2 && <span>...</span>}
-
-                             <button
-                                 onClick={() => setCurrentPage(currentPage + 1)}
-                                 disabled={currentPage === totalPages}>
-                                 Next
-                             </button>
-
-                             <button
-                                 onClick={() => setCurrentPage(totalPages)}
-                                 disabled={currentPage === totalPages}>
-                                 Trang cuối
-                             </button>
-                             <input
-                                 type="text"
-                                 min={1}
-                                 max={totalPages}
-                                 placeholder="Nhập số trang"
-                                 onKeyPress={(e) => {
-                                     if (!/[0-9]/.test(e.key)) {
-                                         e.preventDefault();
-                                     }
-                                 }}
-                                 onChange={(e) => {
-                                     const page = Number(e.target.value);
-                                     if (page >= 1 && page <= totalPages) {
-                                         setCurrentPage(page);
-                                     }
-                                 }}
-                             />
-                         </>
-                     )}
-                 </div>
-                 <div style={showCartArea ? {pointerEvents : 'none', opacity : '0.4'} : {pointerEvents : 'auto', opacity : '1'}} className="user-home-middle" >
-                     {
-                         displayedProducts.map((product) => (
-                             <div key={product.productId} className="user-home-middle-item">
-                                 <div className="user-home-middle-item-img">
-                                     <ImgProductUser productId={product.productId ? product.productId : 0}/>
-                                 </div>
-                                 <div className="user-home-middle-item-price">
-                                     {product.productPrice?.toLocaleString() }
-                                     <u>¥</u> / {product.productUnit?.productUnitName}
-                                 </div>
-                                 <div className="user-home-middle-item-price-origin">
-                                     <PriceOriginComponent price={product.productOriginalPrice ? product.productOriginalPrice : 1000} percent={product.productPercent ? product.productPercent : 0}/>
-                                 </div>
-                                 <div className="user-home-middle-item-productNm">
-                                     {product.productName}
-                                 </div>
-                                 <div className="user-home-middle-item-button">
-                                     <button style={checkProductCartExist(product.productId ? product.productId : 0) == 0 ?  {marginRight : '55%'} : {marginRight : '12%'}} title={'お気に入りのリストを追加します'} type={'button'} className={'btn-like-product'}><FontAwesomeIcon icon={faHeart}/></button>
-                                      <div hidden={checkProductCartExist(product.productId ? product.productId : 0) == 0}  className={'edit-quantity-product'}>
-                                          <button  onClick={() => editQuantity(product.productId ? product.productId : 0 , 0)}>
-                                              -
-                                          </button>
-                                          <div className={'productQuantity'}>
-                                              {checkProductCartExist(product.productId ? product.productId : 0)}
-                                          </div>
-                                          <button onClick={() => editQuantity(product.productId ? product.productId : 0 , 1)}>
-                                              +
-                                          </button>
-                                      </div>
-                                     <button hidden={checkProductCartExist(product.productId ? product.productId : 0) != 0}  title={'カートに追加します'} onClick={() => addCart(product.productId ?  product.productId : 0)} type={'button'} className={'btn btn-danger'}><FontAwesomeIcon icon={faShoppingCart}/></button>
-                                 </div>
-                                 <div hidden={product.point == 0} className="user-home-middle-item-point-area">
-                                     <div className="user-home-middle-item-point">
-                                         x{product.point}
-                                     </div>
-                                     <div className="user-home-middle-item-point-des">
-                                         ポイント
-                                     </div>
-                                 </div>
-                             </div>
-                         ))
-                     }
-                 </div>
+                {
+                    cartResults.productCartList && cartResults.productCartList.length > 0 ?
+                        (
+                            <div className={'cart-screen'} hidden={!showCartScreen}>
+                                <CartScreen cartResponse={cartResults} client={client ? client : new Client()}
+                                            editQuantity={editQuantity}
+                                            deleteAllProductOfCart={deleteAllProductOfCart}/>
+                            </div>
+                        ) :
+                        (
+                            <div className={'cart-screen-no-content'} hidden={!showCartScreen}>
+                                <div className="cart-screen-no-content-img">
+                                    <img src="https://cdn-b2c.mmpro.vn/cart-empty-qDN.svg" alt=""/>
+                                </div>
+                                <div className="cart-screen-no-content-text">
+                                    Không có sản phẩm nào trong giỏ hàng
+                                </div>
+                                <div className="cart-screen-no-content-btn">
+                                    <button onClick={() => navigate('/user/home')} className={'btn btn-primary'}>Trang chủ</button>
+                                </div>
+                            </div>
+                        )
+                }
             </div>
             <div className="cart-detail-area" hidden={!showCartArea}>
                 <div className="cart-detail-area-header">
@@ -311,22 +364,28 @@ function UserHome() {
                 <div className="cart-detail-area-content">
                     {
                         (cartResults.productCartList && cartResults.productCartList.length > 0) ?
-                        cartResults.productCartList?.map((product, index) => (
+                            cartResults.productCartList?.map((product, index) => (
 
-                            <CartDetailItem client={client ? client : new Client()}  productId={product.productId ? product.productId : 0} quantity={product.quantity ? product.quantity : 0} key={product.productId} index={index}  editQuantity={editQuantity} productCartId={Number(product.productCartId)} />
-                        ))
-                        :
-                        (<div className={'no-content'}>
-                            <img src="https://cdn-b2c.mmpro.vn/cart-empty-qDN.svg" alt=""/>
-                            <div className="no-content-text">
-                                Không có sản phẩm nào trong giỏ hàng
-                            </div>
-                        </div>)
+                                <CartDetailItem client={client ? client : new Client()}
+                                                productId={product.productId ? product.productId : 0}
+                                                quantity={product.quantity ? product.quantity : 0}
+                                                key={product.productId} index={index} editQuantity={editQuantity}
+                                                productCartId={Number(product.productCartId)}/>
+                            ))
+                            :
+                            (<div className={'no-content'}>
+                                <img src="https://cdn-b2c.mmpro.vn/cart-empty-qDN.svg" alt=""/>
+                                <div className="no-content-text">
+                                    Không có sản phẩm nào trong giỏ hàng
+                                </div>
+                            </div>)
                     }
 
                 </div>
-                <div hidden={(!cartResults.productCartList || cartResults.productCartList.length  === 0)} className="cart-detail-bottom">
-                    <div className="cart-detail-bottom-left" onClick={() => deleteAllProductOfCart(Number(cartResults.cartId))}>
+                <div hidden={(!cartResults.productCartList || cartResults.productCartList.length === 0)}
+                     className="cart-detail-bottom">
+                    <div className="cart-detail-bottom-left"
+                         onClick={() => deleteAllProductOfCart(Number(cartResults.cartId))}>
                         Xóa tất cả
                     </div>
                     <div className="cart-detail-bottom-right">
@@ -338,9 +397,15 @@ function UserHome() {
                         </div>
                     </div>
                 </div>
-                <button hidden={(!cartResults.productCartList || cartResults.productCartList.length  === 0)} id={'see-cart'} className={'btn btn-primary'}>Xem giỏ hàng</button>
+                <button onClick={() => {
+                    setShowCartScreen(true);
+                    setShowCartArea(false)
+                }} hidden={(!cartResults.productCartList || cartResults.productCartList.length === 0)} id={'see-cart'}
+                        className={'btn btn-primary'}>Xem giỏ hàng
+                </button>
             </div>
         </div>
     )
 }
+
 export default UserHome
