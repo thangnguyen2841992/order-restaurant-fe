@@ -16,6 +16,7 @@ import {getCartResponseOfUserId} from "../../api/Cart-Api";
 import CartDetailItem from "./CartDetailItem";
 import CartScreen from "./CartScreen";
 import {useNavigate} from "react-router-dom";
+import Order from "./Order";
 
 
 function UserHome() {
@@ -27,6 +28,7 @@ function UserHome() {
     const userTokenId = getUserToken().userId;
     const [showCartArea, setShowCartArea] = useState(false);
     const [showCartScreen, setShowCartScreen] = useState(false);
+    const [showOrderScreen, setShowOrderScreen] = useState(false);
     const navigate = useNavigate();
 
 
@@ -163,11 +165,11 @@ function UserHome() {
 
     return (
         <div className={'user-home-area'}>
-            <Navbar cartResponse={cartResults} handleShowHideCartArea={setShowCartArea}/>
+            <Navbar cartResponse={cartResults} handleShowHideCartArea={setShowCartArea} setShowCartScreen={setShowCartScreen}/>
             <div onClick={() => setShowCartArea(false)} className="user-home-content">
                 <NavUser handleChangeMenuUser={handleChangeMenuUser}
                          handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
-                <div hidden={showCartScreen} className={'user-home-detail'}>
+                <div hidden={showCartScreen || showOrderScreen} className={'user-home-detail'}>
                     <div className="user-home-header">
                         <div className="user-home-header-top">
                             <div className={'user-home-header-top-home'}>家</div>
@@ -240,7 +242,7 @@ function UserHome() {
                                     min={1}
                                     max={totalPages}
                                     placeholder="Nhập số trang"
-                                    onKeyPress={(e) => {
+                                    onKeyDown={(e) => {
                                         if (!/[0-9]/.test(e.key)) {
                                             e.preventDefault();
                                         }
@@ -321,11 +323,13 @@ function UserHome() {
                 {
                     cartResults.productCartList && cartResults.productCartList.length > 0 ?
                         (
-                            <div className={'cart-screen'} hidden={!showCartScreen}>
-                                <CartScreen cartResponse={cartResults} client={client ? client : new Client()}
+                            <div  className={'cart-screen'}>
+                                <CartScreen setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen} showCartScreen={showCartScreen}  cartResponse={cartResults} client={client ? client : new Client()}
                                             editQuantity={editQuantity}
                                             deleteAllProductOfCart={deleteAllProductOfCart}/>
+                                <Order cartResult={cartResults} showOrderScreen={showOrderScreen}/>
                             </div>
+
                         ) :
                         (
                             <div className={'cart-screen-no-content'} hidden={!showCartScreen}>

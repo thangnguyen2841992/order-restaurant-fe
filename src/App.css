@@ -12,6 +12,9 @@
     z-index: 3000; /* Đảm bảo navbar nằm trên các phần tử khác */
 
 }
+.navbar-area-logo {
+    cursor: pointer;
+}
 
 .navbar-area-logo img {
     width: 80px;
@@ -856,12 +859,12 @@ td {
     font-weight: 500;
 }
 
-.cart-screen-middle {
+.cart-screen-middle, .order-area {
     padding: 1.5% 5%;
     display: flex;
 }
 
-.cart-screen-middle-left {
+.cart-screen-middle-left, .order-area-left {
     background-color: #f8f8f8;
     width: 60%;
     padding: 20px;
@@ -869,7 +872,7 @@ td {
     margin-right: 2%;
 }
 
-.cart-screen-middle-right {
+.cart-screen-middle-right, .order-area-right {
     width: 40%;
     background-color: #f8f8f8;
     padding: 20px;
@@ -935,4 +938,49 @@ td {
 .cart-screen-no-content-btn button {
     font-size: 20px;
     font-weight: 500;
+}
+.order-area-left-header {
+    font-weight: bold;
+    font-size: 20px;
+    line-height: normal;
+}
+.order-area-left-user-info-title {
+    font-size: 18px;
+    line-height: normal;
+    font-weight: 500;
+    color: #0272ba;
+    margin-bottom: 10px;
+}
+.order-area-left-user-info, .order-area-left-address {
+    display: flex;
+    flex-direction: column;
+    background-color: #feffff;
+    padding: 20px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+.order-area-left-user-info-item {
+    padding: 5px 0;
+}
+.order-area-left-address-top {
+    font-weight: 500;
+}
+.order-area-left-address-bottom {
+    color: #7a7e80;
+}
+textarea {
+    width: 100%;
+    height: 100px;
+    border-radius: 5px;
+    padding:10px 20px;
+    border: 1px solid #dbdbdb;
+    color: #7a7e80;
+    outline: none;
+}
+#note-order {
+    color: #7a7e80;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: .12px;
 }

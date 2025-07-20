@@ -8,12 +8,15 @@ import {Client} from "@stomp/stompjs";
 interface CartScreenInterface {
     cartResponse : CartResponse,
     client : Client,
+    showCartScreen : boolean
     editQuantity : (productId : number, type : number) => void
     deleteAllProductOfCart : (cartId : number) => void
+    setShowCartScreen : (showCartScreen : boolean) => void
+    setShowOrderScreen: (showCartScreen : boolean) => void
 }
-const CartScreen : React.FC<CartScreenInterface> = ({cartResponse, client, editQuantity, deleteAllProductOfCart}) => {
+const CartScreen : React.FC<CartScreenInterface> = ({cartResponse, client, editQuantity, deleteAllProductOfCart, showCartScreen, setShowCartScreen, setShowOrderScreen}) => {
    return (
-       <div id={'cart-screen-area'}>
+       <div hidden={!showCartScreen} id={'cart-screen-area'}>
            <div className="cart-screen-header">
                <div className="cart-screen-header-top">
                    <div className={'cart-screen-header-top-home'}>家</div>
@@ -87,7 +90,7 @@ const CartScreen : React.FC<CartScreenInterface> = ({cartResponse, client, editQ
                                Chưa tính
                            </div>
                        </div>
-                       <button style={{width : '100%', margin : '10px 0'}} className={'btn btn-primary'}>Tiến hành thanh toán</button>
+                       <button onClick={() => {setShowCartScreen(false); setShowOrderScreen(true);}} style={{width : '100%', margin : '10px 0'}} className={'btn btn-primary'}>Tiến hành thanh toán</button>
                    </div>
                </div>
            </div>

@@ -7,18 +7,31 @@ import {Dropdown} from "react-bootstrap";
 import CartResponse from "../../model/CartResponse";
 
 interface NavbarInterface {
-    cartResponse : CartResponse
-    handleShowHideCartArea : (value : boolean) => void
+    cartResponse: CartResponse
+    handleShowHideCartArea: (value: boolean) => void
+    setShowCartScreen: (value: boolean) => void
 }
 
-const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea}) => {
+const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea, setShowCartScreen}) => {
     const navigate = useNavigate();
     const fullName = getUserToken().fullName;
+    const userToken = getUserToken();
 
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('expirationTime');
         navigate('/login');
+    }
+
+    const backHomePage = () => {
+        if (userToken.isUser) {
+            setShowCartScreen(false);
+            navigate('/user/home');
+        } else if (userToken.isStaff) {
+            navigate('/staff/home');
+        } else {
+            navigate('/admin/home');
+        }
     }
 
 
@@ -36,7 +49,7 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
 
     return (
         <div className={'navbar-area'}>
-            <div onClick={() => navigate('/user/home')} className="navbar-area-logo">
+            <div title={'Trang chủ'} onClick={() => backHomePage()} className="navbar-area-logo">
                 <img src={'/logo3-removebg-preview.png'} alt=""/>
             </div>
             <div className="navbar-area-search">
@@ -46,19 +59,20 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
                 </button>
             </div>
             <div className={'navbar-area-action'}>
-                    <button hidden={!getUserToken().isUser} id={'btnLikeProduct'}  title={'お気に入り'}>
-                        <FontAwesomeIcon icon={faHeart}/>
+                <button hidden={!getUserToken().isUser} id={'btnLikeProduct'} title={'お気に入り'}>
+                    <FontAwesomeIcon icon={faHeart}/>
+                </button>
+                <div hidden={!getUserToken().isUser} className={'cart-area'}
+                     onClick={() => handleShowHideCartArea(true)}>
+                    <button id={'btnCartProduct'} title={'ショッピングカート'}>
+                        <FontAwesomeIcon icon={faShoppingCart}/>
                     </button>
-                    <div hidden={!getUserToken().isUser} className={'cart-area'} onClick={() => handleShowHideCartArea(true)}>
-                        <button id={'btnCartProduct'} title={'ショッピングカート'}>
-                            <FontAwesomeIcon icon={faShoppingCart}/>
-                        </button>
-                        <div hidden={cartResponse.productCartList?.length === 0} className={'totalProductCart'}>
-                            {cartResponse.productCartList?.length}
-                        </div>
+                    <div hidden={cartResponse.productCartList?.length === 0} className={'totalProductCart'}>
+                        {cartResponse.productCartList?.length}
                     </div>
+                </div>
 
-                <Dropdown >
+                <Dropdown>
                     <Dropdown.Toggle variant="success" id="dropdown-basic">
                         おはよう: {fullName}
                     </Dropdown.Toggle>

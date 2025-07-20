@@ -177,7 +177,7 @@ function StaffHome() {
     }, [brandId, actionModalCreateUpdate])
     return (
         <div className={'staff-home-area'}>
-            <Navbar cartResponse={cartResponse} handleShowHideCartArea={setTest}/>
+            <Navbar cartResponse={cartResponse} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
             <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
                       handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
             <div className="staff-home-content">
