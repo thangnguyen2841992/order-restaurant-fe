@@ -50,7 +50,7 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
     return (
         <div className={'navbar-area'}>
             <div title={'Trang chủ'} onClick={() => backHomePage()} className="navbar-area-logo">
-                <img src={'/logo3-removebg-preview.png'} alt=""/>
+                <img onClick={backHomePage} src={'/logo3-removebg-preview.png'} alt=""/>
             </div>
             <div className="navbar-area-search">
                 <input type="text" placeholder={'どの製品を見つける必要がありますか？'}/>
