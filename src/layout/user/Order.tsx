@@ -10,10 +10,11 @@ interface OrderInterface {
     showOrderScreen: boolean;
     setShowCartScreen : (value : boolean) => void;
     setShowOrderScreen : (value : boolean) => void;
+    setReloadPage : (value : boolean) => void;
     client: Client;
 }
 
-const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOrderScreen, setShowCartScreen, client}) => {
+const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOrderScreen, setShowCartScreen, client , setReloadPage}) => {
     const [time, setTime] = React.useState<number>(1);
     const [payment, setPayment] = React.useState<number>(1);
     const [orderDescription, setOrderDescription] = React.useState<string>('');
@@ -49,6 +50,7 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
             });
             setShowCartScreen(false);
             setShowOrderScreen(false);
+            setReloadPage(true);
             navigate("/user/home");
             alert('Bạn đã đặt đơn hàng thành công. Chúng tôi đang xử lý đơn hàng của bạn.')
         }
@@ -118,7 +120,6 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
                     Danh sách sản phẩm
                 </div>
                 <div className="order-area-left-content">
-
                     {
                         cartResult.productCartList?.map((product, index) =>
                             <CartDetailItem key={product.productCartId} type={'order'} index={index} productId={product.productId ? product.productId : 0} productCartId={product.productCartId ? product.productCartId : 0} quantity={product.quantity ? product.quantity : 0} editQuantity={() => {}} client={new Client()}/>
@@ -163,8 +164,6 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
                         </div>
                     </div>
                     <p style={{marginLeft : '10px', fontSize : '14px'}}><span style={{color : 'red'}}>*</span><span style={{color : '#7a7e80'}}> Phí giao hàng thanh toán khi nhận hàng</span></p>
-
-
                     <div  className="order-area-left-user-info">
                         <div style={{marginBottom : '10px', marginTop : '-20px'}}  className={'order-area-left-header'}>Phương thức thanh toán</div>
                         <div className="form-group">
@@ -182,7 +181,6 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
                             </div>
                         </div>
                     </div>
-
                     <button onClick={() => {createNewOrder();}} style={{width : '100%', margin : '10px 0'}} className={'btn btn-primary'}>Tiến hành thanh toán</button>
                 </div>
             </div>

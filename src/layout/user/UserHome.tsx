@@ -29,6 +29,7 @@ function UserHome() {
     const [showCartArea, setShowCartArea] = useState(false);
     const [showCartScreen, setShowCartScreen] = useState(false);
     const [showOrderScreen, setShowOrderScreen] = useState(false);
+    const [reloadPage, setReloadPage] = useState(false);
     const navigate = useNavigate();
 
 
@@ -58,14 +59,6 @@ function UserHome() {
         }
         return 0;
     }
-
-    useEffect(() => {
-        getCartResponseOfUserId().then((data) => {
-            setCartResults(data);
-        }).catch((error) => {
-            console.log(error)
-        })
-    }, []);
 
     useEffect(() => {
         const stompClient = new Client({
@@ -106,6 +99,11 @@ function UserHome() {
     }, []);
 
     useEffect(() => {
+        getCartResponseOfUserId().then((data) => {
+            setCartResults(data);
+        }).catch((error) => {
+            console.log(error)
+        })
         if (Number(brandId) !== 0) {
             getAllProductsOfBrand(brandId).then((data) => {
                 setProducts(data);
@@ -119,7 +117,8 @@ function UserHome() {
                 console.log(error);
             })
         }
-    }, [brandId])
+        setReloadPage(false);
+    }, [brandId, reloadPage])
 
     const addCart = (productId: number) => {
         if (client) {
@@ -166,7 +165,7 @@ function UserHome() {
 
     return (
         <div className={'user-home-area'}>
-            <Navbar cartResponse={cartResults} handleShowHideCartArea={setShowCartArea} setShowCartScreen={setShowCartScreen}/>
+            <Navbar  setReloadPage={setReloadPage} setShowOrderScreen={setShowOrderScreen} cartResponse={cartResults} handleShowHideCartArea={setShowCartArea} setShowCartScreen={setShowCartScreen}/>
             <div onClick={() => setShowCartArea(false)} className="user-home-content">
                 <NavUser handleChangeMenuUser={handleChangeMenuUser}
                          handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
@@ -328,7 +327,7 @@ function UserHome() {
                                 <CartScreen setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen} showCartScreen={showCartScreen}  cartResponse={cartResults} client={client ? client : new Client()}
                                             editQuantity={editQuantity}
                                             deleteAllProductOfCart={deleteAllProductOfCart}/>
-                                <Order client={client ? client : new Client()} cartResult={cartResults} showOrderScreen={showOrderScreen} setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen}/>
+                                <Order setReloadPage={setReloadPage} client={client ? client : new Client()} cartResult={cartResults} showOrderScreen={showOrderScreen} setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen}/>
                             </div>
 
                         ) :

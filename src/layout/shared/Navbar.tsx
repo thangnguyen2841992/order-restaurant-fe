@@ -10,9 +10,12 @@ interface NavbarInterface {
     cartResponse: CartResponse
     handleShowHideCartArea: (value: boolean) => void
     setShowCartScreen: (value: boolean) => void
+    setShowOrderScreen: (value: boolean) => void
+    setReloadPage : (value : boolean) => void;
+
 }
 
-const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea, setShowCartScreen}) => {
+const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea, setShowCartScreen, setReloadPage, setShowOrderScreen}) => {
     const navigate = useNavigate();
     const fullName = getUserToken().fullName;
     const userToken = getUserToken();
@@ -26,6 +29,8 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
     const backHomePage = () => {
         if (userToken.isUser) {
             setShowCartScreen(false);
+            setShowOrderScreen(false);
+            setReloadPage(true);
             navigate('/user/home');
         } else if (userToken.isStaff) {
             navigate('/staff/home');

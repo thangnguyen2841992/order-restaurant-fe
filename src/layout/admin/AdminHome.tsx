@@ -163,7 +163,7 @@ function AdminHome() {
     },[menuAdmin])
     return (
         <div className={'admin-home-area'}>
-            <Navbar cartResponse={cartResults} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
+            <Navbar setShowOrderScreen={() => {}} setReloadPage={() => {}} cartResponse={cartResults} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
             <NavAdmin handleChangeMenuAdmin={handleChangeMenuAdmin} />
             <div className="admin-home-content">
                 <div className="admin-home-left">
