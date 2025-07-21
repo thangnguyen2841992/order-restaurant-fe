@@ -494,13 +494,14 @@ td {
     max-height: 600px;
 }
 
+
 .imgProductUser {
     padding: 10px;
     width: 100%;
     height: 280px;
     position: absolute;
     left: 0;
-    bottom: 200px;
+    bottom: 210px;
 }
 
 .imgProductUser img {
@@ -510,13 +511,14 @@ td {
 
 }
 
+
 .user-home-middle-item-price {
     font-weight: bold;
     text-align: left;
-    margin-top: 10px;
     font-size: 20px;
     position: absolute;
     bottom: 160px;
+
 }
 
 .price-origin-component {
@@ -543,13 +545,18 @@ td {
     font-size: 13px;
     font-weight: 500;
 }
-
+.user-home-middle-item-quantity {
+    position: absolute;
+    bottom: 100px;
+}
 .user-home-middle-item-productNm {
     text-align: left;
     margin-top: 10px;
     font-size: 14px;
     position: absolute;
     bottom: 80px;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .user-home-middle-item-button {

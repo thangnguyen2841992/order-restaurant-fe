@@ -10,7 +10,7 @@ const PriceOriginComponent: React.FC<PriceOriginComponentProps> = ({price, perce
     return (
         <div className={'price-origin-component'}>
             <div className="price-origin-component-price">
-                {price} <u>¥</u>
+                {price.toLocaleString()} <u>¥</u>
             </div>
             <div className="price-origin-component-percent">
                 -{percent} %

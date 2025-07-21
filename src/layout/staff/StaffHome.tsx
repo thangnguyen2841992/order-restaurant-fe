@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {ChangeEvent, useEffect, useRef, useState} from "react";
 import NavStaff from "./NavStaff";
 import Navbar from "../shared/Navbar";
 import Product from "../../model/Product";
@@ -70,6 +70,27 @@ function StaffHome() {
         setBrandId(Number(value));
     };
 
+    const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
+    const isAllChecked = displayedProducts.length > 0 && selectedProductIds.length === displayedProducts.length;
+
+
+    const handleCheckboxChange = (productId: number, isChecked: boolean) => {
+        if (isChecked) {
+            setSelectedProductIds(prev => [...prev, productId]);
+        } else {
+            setSelectedProductIds(prev => prev.filter(id => id !== productId));
+        }
+    };
+
+    const handleCheckAllChange = (isChecked: boolean) => {
+        if (isChecked) {
+            const allProductIds: number[] = displayedProducts.map(product => product.productId ? product.productId : productId);
+            setSelectedProductIds(allProductIds);
+        } else {
+            setSelectedProductIds([]);
+        }
+    };
+
     const deleteProduct = async (productId: number) => {
         try {
             const url: string = `http://localhost:8083/staff-api/deleteProduct?productId=${productId}`;
@@ -98,7 +119,7 @@ function StaffHome() {
         setShowModalUploadProduct(false);
     }
 
-    const onExcelFileChange = (event: React.ChangeEvent<HTMLInputElement>, type : string) => {
+    const onExcelFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: string) => {
         const file = event.target.files?.[0];
         if (file) {
             const fileType = file.type;
@@ -116,10 +137,10 @@ function StaffHome() {
                     const worksheet = workbook.Sheets[firstSheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
 
-                    const dataWithoutHeader = jsonData.slice(1).filter((row : any) => row && row.length > 0);
+                    const dataWithoutHeader = jsonData.slice(1).filter((row: any) => row && row.length > 0);
 
                     const productUploads = dataWithoutHeader.map((row: any) => {
-                        if (row && row.length > 0 ) {
+                        if (row && row.length > 0) {
                             if (type == 'create') {
                                 const imageLinks = row[7] ? row[7].split(',') : [];
                                 const newImages = imageLinks.map((link: string) => ({
@@ -139,7 +160,7 @@ function StaffHome() {
                             } else {
                                 return {
                                     productId: row[0],
-                                    productName : row[1],
+                                    productName: row[1],
                                     quantity: row[2]
                                 }
                             }
@@ -177,7 +198,9 @@ function StaffHome() {
     }, [brandId, actionModalCreateUpdate])
     return (
         <div className={'staff-home-area'}>
-            <Navbar setShowOrderScreen={() => {}} setReloadPage={() => {}} cartResponse={cartResponse} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
+            <Navbar setShowOrderScreen={() => {
+            }} setReloadPage={() => {
+            }} cartResponse={cartResponse} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
             <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
                       handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
             <div className="staff-home-content">
@@ -194,6 +217,8 @@ function StaffHome() {
                                 <input ref={fileInputRefEdit} hidden required type="file"
                                        className="form-control" id="imageProductEdit"
                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onExcelFileChange(e, 'edit')}/>
+                                <button hidden={selectedProductIds.length === 0} style={{marginRight : '10px'}} className={'btn btn-danger'}>Xóa tất cả</button>
+
                                 <button style={{marginRight: '10px'}} className={'btn btn-success'}
                                         onClick={handleEditProductByExcel}>Excelファイルから製品の数量を更新する
                                 </button>
@@ -259,7 +284,7 @@ function StaffHome() {
                                         min={1}
                                         max={totalPages}
                                         placeholder="Nhập số trang"
-                                        onKeyPress={(e) => {
+                                        onKeyDown={(e) => {
                                             if (!/[0-9]/.test(e.key)) {
                                                 e.preventDefault();
                                             }
@@ -278,6 +303,8 @@ function StaffHome() {
                         <table className="table table-bordered">
                             <thead>
                             <tr>
+                                <th><input type="checkbox" onChange={(e) => handleCheckAllChange(e.target.checked)}
+                                           checked={isAllChecked}/></th>
                                 <th scope="col">STT</th>
                                 <th scope="col">Tên Sản Phẩm</th>
                                 <th scope="col">Danh Mục Sản Phẩm</th>
@@ -294,7 +321,11 @@ function StaffHome() {
                             {
                                 displayedProducts.length > 0 ? (displayedProducts.map((product, index) => (
                                     <tr key={product.productId}>
-                                        <th scope="row">{index + 1}</th>
+                                        <td><input type="checkbox"
+                                                   onChange={(e : ChangeEvent<HTMLInputElement>) => handleCheckboxChange(product.productId ? product.productId : 0, e.target.checked)}
+                                                   checked={selectedProductIds.includes(product.productId ? product.productId : 0)}/>
+                                        </td>
+                                        <td scope="row">{index + 1}</td>
                                         <td onClick={() => product.productId && handleShowModalCreatePopup(product.productId, 'U')}
                                             id={'td-product-name'}
                                             style={{color: 'blue', cursor: 'pointer'}}>{product.productName}</td>

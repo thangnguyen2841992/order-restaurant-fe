@@ -267,14 +267,18 @@ function UserHome() {
                                     <div className="user-home-middle-item-img">
                                         <ImgProductUser productId={product.productId ? product.productId : 0}/>
                                     </div>
-                                    <div className="user-home-middle-item-price">
-                                        {product.productPrice?.toLocaleString()}
-                                        <u>¥</u> / {product.productUnit?.productUnitName}
-                                    </div>
+                                        <div className="user-home-middle-item-price">
+                                            {product.productPrice?.toLocaleString()}
+                                            <u>¥</u> / {product.productUnit?.productUnitName}
+                                        </div>
+
                                     <div className="user-home-middle-item-price-origin">
                                         <PriceOriginComponent
                                             price={product.productOriginalPrice ? product.productOriginalPrice : 1000}
                                             percent={product.productPercent ? product.productPercent : 0}/>
+                                    </div>
+                                    <div style={{ color: product.quantity  && product.quantity > 10 ? 'green' : product.quantity && product.quantity > 0 ? 'orange' : 'red' , fontSize : '15px', fontWeight: '400', lineHeight: 'normal'}} className="user-home-middle-item-quantity">
+                                       Còn lại:  {product.quantity} ({product.productUnit?.productUnitName})
                                     </div>
                                     <div className="user-home-middle-item-productNm">
                                         {product.productName}
