@@ -3,18 +3,22 @@ import React, {ChangeEvent} from "react";
 import {getUserToken} from "../../api/Public-Api";
 import CartDetailItem from "./CartDetailItem";
 import {Client} from "@stomp/stompjs";
+import {useNavigate} from "react-router-dom";
 
 interface OrderInterface {
     cartResult: CartResponse;
     showOrderScreen: boolean;
     setShowCartScreen : (value : boolean) => void;
     setShowOrderScreen : (value : boolean) => void;
+    client: Client;
 }
 
-const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOrderScreen, setShowCartScreen}) => {
-    const [time, setTime] = React.useState<number>(0);
-    const [payment, setPayment] = React.useState<number>(0);
+const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOrderScreen, setShowCartScreen, client}) => {
+    const [time, setTime] = React.useState<number>(1);
+    const [payment, setPayment] = React.useState<number>(1);
     const [orderDescription, setOrderDescription] = React.useState<string>('');
+    const navigate = useNavigate();
+
 
     const handleTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
         setTime(Number(e.target.value));
@@ -27,8 +31,27 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
         setOrderDescription(e.target.value);
     }
 
-    const editQuantity = () => {
+    const createNewOrder = () => {
+        if (client) {
+            const userId = getUserToken().userId;
 
+            let messageCartSend = JSON.stringify({
+                userId: userId,
+                cartId: cartResult.cartId,
+                description: orderDescription,
+                deliveryId: time,
+                paymentId: payment,
+                totalPrice : cartResult.totalPrice
+            })
+            client.publish({
+                destination: '/app/add-order',
+                body: messageCartSend
+            });
+            setShowCartScreen(false);
+            setShowOrderScreen(false);
+            navigate("/user/home");
+            alert('Bạn đã đặt đơn hàng thành công. Chúng tôi đang xử lý đơn hàng của bạn.')
+        }
     }
 
     return (
@@ -64,13 +87,13 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
                         <div className="form-check form-check-inline">
                             <input onChange={handleTimeChange} className="form-check-input" type="radio"
                                    name="time"
-                                   id="time24" value="0" checked={time === 0}/>
+                                   id="time24" value="1" checked={time === 1}/>
                             <label className="form-check-label" htmlFor="time24">Giao nhanh 24h</label>
                         </div>
                         <div className="form-check form-check-inline">
                             <input onChange={handleTimeChange} className="form-check-input" type="radio"
                                    name="time"
-                                   id="timeFree" value="1" checked={time === 1}/>
+                                   id="timeFree" value="2" checked={time === 2}/>
                             <label className="form-check-label" htmlFor="timeFree">Giao hàng bình thường</label>
                         </div>
                     </div>
@@ -98,7 +121,7 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
 
                     {
                         cartResult.productCartList?.map((product, index) =>
-                            <CartDetailItem key={product.productCartId} type={'order'} index={index} productId={product.productId ? product.productId : 0} productCartId={product.productCartId ? product.productCartId : 0} quantity={product.quantity ? product.quantity : 0} editQuantity={editQuantity} client={new Client()}/>
+                            <CartDetailItem key={product.productCartId} type={'order'} index={index} productId={product.productId ? product.productId : 0} productCartId={product.productCartId ? product.productCartId : 0} quantity={product.quantity ? product.quantity : 0} editQuantity={() => {}} client={new Client()}/>
                         )
                     }
                 </div>
@@ -148,19 +171,19 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
                             <div className="form-check form-check-inline">
                                 <input onChange={handlePaymentChange} className="form-check-input" type="radio"
                                        name="payment"
-                                       id="paymentCod" value="0" checked={payment === 0}/>
+                                       id="paymentCod" value="1" checked={payment === 1}/>
                                 <label style={{fontSize : '16px', color : '#2a2f33', lineHeight: 'normal', fontWeight : '400'}} className="form-check-label" htmlFor="paymentCod">Thanh toán khi nhận hàng(COD)</label>
                             </div>
                             <div className="form-check form-check-inline">
                                 <input onChange={handlePaymentChange} className="form-check-input" type="radio"
                                        name="payment"
-                                       id="paymentCard" value="1" checked={payment === 1}/>
+                                       id="paymentCard" value="2" checked={payment === 2}/>
                                 <label style={{fontSize : '16px', color : '#2a2f33', lineHeight: 'normal', fontWeight : '400'}} className="form-check-label" htmlFor="paymentCard">Thanh toán qua tài khoản ngân hàng</label>
                             </div>
                         </div>
                     </div>
 
-                    <button style={{width : '100%', margin : '10px 0'}} className={'btn btn-primary'}>Tiến hành thanh toán</button>
+                    <button onClick={() => {createNewOrder();}} style={{width : '100%', margin : '10px 0'}} className={'btn btn-primary'}>Tiến hành thanh toán</button>
                 </div>
             </div>
         </div>

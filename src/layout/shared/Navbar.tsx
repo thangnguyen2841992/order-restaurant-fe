@@ -68,7 +68,7 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
                         <FontAwesomeIcon icon={faShoppingCart}/>
                     </button>
                     <div hidden={cartResponse.productCartList?.length === 0} className={'totalProductCart'}>
-                        {cartResponse.productCartList?.length}
+                        {cartResponse.totalProduct}
                     </div>
                 </div>
 
@@ -78,6 +78,7 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item onClick={logout} eventKey="Option 1">ログアウト</Dropdown.Item>
+                        <Dropdown.Item onClick={logout} eventKey="Option 2">Quản lý đơn hàng</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </div>

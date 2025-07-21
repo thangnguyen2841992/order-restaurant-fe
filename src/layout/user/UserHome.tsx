@@ -86,7 +86,8 @@ function UserHome() {
                         dateCreated: cart.dateCreated,
                         productCartList: cart.productCartList,
                         userId: cart.userId,
-                        totalPrice: cart.totalPrice
+                        totalPrice: cart.totalPrice,
+                        totalProduct: cart.totalProduct
                     }
                     setCartResults(cartResponse);
                 });
@@ -181,7 +182,7 @@ function UserHome() {
                                 {brandName}
                             </div>
                             <div className="user-home-header-bottom-right">
-                                1210 製品
+                                {products.length} 製品
                             </div>
                         </div>
                     </div>
@@ -327,7 +328,7 @@ function UserHome() {
                                 <CartScreen setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen} showCartScreen={showCartScreen}  cartResponse={cartResults} client={client ? client : new Client()}
                                             editQuantity={editQuantity}
                                             deleteAllProductOfCart={deleteAllProductOfCart}/>
-                                <Order cartResult={cartResults} showOrderScreen={showOrderScreen} setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen}/>
+                                <Order client={client ? client : new Client()} cartResult={cartResults} showOrderScreen={showOrderScreen} setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen}/>
                             </div>
 
                         ) :
