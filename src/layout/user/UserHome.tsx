@@ -327,7 +327,7 @@ function UserHome() {
                                 <CartScreen setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen} showCartScreen={showCartScreen}  cartResponse={cartResults} client={client ? client : new Client()}
                                             editQuantity={editQuantity}
                                             deleteAllProductOfCart={deleteAllProductOfCart}/>
-                                <Order cartResult={cartResults} showOrderScreen={showOrderScreen}/>
+                                <Order cartResult={cartResults} showOrderScreen={showOrderScreen} setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen}/>
                             </div>
 
                         ) :
@@ -370,7 +370,7 @@ function UserHome() {
                         (cartResults.productCartList && cartResults.productCartList.length > 0) ?
                             cartResults.productCartList?.map((product, index) => (
 
-                                <CartDetailItem client={client ? client : new Client()}
+                                <CartDetailItem type={'cart'} client={client ? client : new Client()}
                                                 productId={product.productId ? product.productId : 0}
                                                 quantity={product.quantity ? product.quantity : 0}
                                                 key={product.productId} index={index} editQuantity={editQuantity}

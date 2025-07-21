@@ -42,7 +42,7 @@ const CartScreen : React.FC<CartScreenInterface> = ({cartResponse, client, editQ
                     <div className="cart-screen-middle-content">
                         {
                             cartResponse.productCartList?.map((product, index) => (
-                                <CartDetailItem client={client ? client : new Client()}  productId={product.productId ? product.productId : 0} quantity={product.quantity ? product.quantity : 0} key={product.productId} index={index}  editQuantity={editQuantity} productCartId={Number(product.productCartId)} />
+                                <CartDetailItem type={'cartScreen'} client={client ? client : new Client()}  productId={product.productId ? product.productId : 0} quantity={product.quantity ? product.quantity : 0} key={product.productId} index={index}  editQuantity={editQuantity} productCartId={Number(product.productCartId)} />
                             ))
                         }
                     </div>

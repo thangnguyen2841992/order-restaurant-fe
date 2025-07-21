@@ -11,9 +11,11 @@ interface CartDetailItemInterface {
     quantity: number;
     editQuantity: (productId: number, type: number) => void;
     client : Client;
+    type : string;
 }
 
-const CartDetailItem: React.FC<CartDetailItemInterface> = ({productCartId,productId, quantity, index, editQuantity, client}) => {
+// @ts-ignore
+const CartDetailItem: React.FC<CartDetailItemInterface> = ({productCartId,productId, quantity, index, editQuantity, client, type}) => {
     const [product, setProduct] = useState<Product>({});
     const [image, setImage] = useState<string>('');
 
@@ -41,8 +43,59 @@ const CartDetailItem: React.FC<CartDetailItemInterface> = ({productCartId,produc
             });
         }
     }
+    if (type === undefined) {
+        return  (
+            <div></div>
+        )
+    }
+    if (type !== 'order') {
+        return (
+            <div>
+                <div className="cart-detail-area-content-item">
+                    <div className="cart-detail-area-content-item-index">
+                        {index + 1}
+                    </div>
+                    <div className="cart-detail-area-content-item-image">
+                        <img src={`data:image/jpeg;base64,${image}`} alt="Anh san pham"/>
+                    </div>
+                    <div className="cart-detail-area-content-item-name-price">
+                        <div className="cart-detail-area-content-item-name">
+                            {product.productName}
+                        </div>
+                        <div className="cart-detail-area-content-item-price">
+                            {product.productPrice?.toLocaleString()} <u>¥</u>
+                        </div>
+                    </div>
 
-    return (
+                    <div className="cart-detail-area-content-item-quantity">
+                        <button onClick={() => editQuantity(product.productId ? product.productId : 0, 0)}>
+                            -
+                        </button>
+                        <div className={'product-quantity-cart'}>
+                            {quantity}
+                        </div>
+                        <button onClick={() => editQuantity(product.productId ? product.productId : 0, 1)}>
+                            +
+                        </button>
+                    </div>
+                    <div className="cart-detail-area-content-item-total">
+                        <div className="cart-detail-area-content-item-total-top">
+                            Thành tiền
+                        </div>
+                        <div className="cart-detail-area-content-item-total-bottom">
+                            {(Number(product.productPrice) * Number(quantity)).toLocaleString()} <u>¥</u>
+                        </div>
+                    </div>
+                    <div className="cart-detail-area-content-item-delete" onClick={() => removeProductCart(productCartId)}>
+                        Xóa
+                    </div>
+
+                </div>
+
+            </div>
+        )
+    } else if (type === 'order') {
+        return (
         <div>
             <div className="cart-detail-area-content-item">
                 <div className="cart-detail-area-content-item-index">
@@ -59,33 +112,13 @@ const CartDetailItem: React.FC<CartDetailItemInterface> = ({productCartId,produc
                         {product.productPrice?.toLocaleString()} <u>¥</u>
                     </div>
                 </div>
-
-                <div className="cart-detail-area-content-item-quantity">
-                    <button onClick={() => editQuantity(product.productId ? product.productId : 0, 0)}>
-                        -
-                    </button>
-                    <div className={'product-quantity-cart'}>
-                        {quantity}
-                    </div>
-                    <button onClick={() => editQuantity(product.productId ? product.productId : 0, 1)}>
-                        +
-                    </button>
+                <div className="cart-detail-area-content-item-quantity-order">
+                    x {quantity}
                 </div>
-                <div className="cart-detail-area-content-item-total">
-                    <div className="cart-detail-area-content-item-total-top">
-                            Thành tiền
-                    </div>
-                    <div className="cart-detail-area-content-item-total-bottom">
-                        {(Number(product.productPrice) * Number(quantity)).toLocaleString()} <u>¥</u>
-                    </div>
-                </div>
-                <div className="cart-detail-area-content-item-delete" onClick={() => removeProductCart(productCartId)}>
-                    Xóa
-                </div>
-
             </div>
-
         </div>
-    )
+        )
+    }
+
 }
 export default CartDetailItem
