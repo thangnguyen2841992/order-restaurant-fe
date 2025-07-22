@@ -6,9 +6,10 @@ import {Dropdown} from "react-bootstrap";
 interface NavStaffInterface {
     handleChangeMenuStaff: (value: string) => void
     handleChangeBrandIdSelect: (value: string) => void
+    setShowOrderList : (value: boolean) => void
 }
 
-const NavStaff: React.FC<NavStaffInterface> = ({handleChangeMenuStaff, handleChangeBrandIdSelect}) => {
+const NavStaff: React.FC<NavStaffInterface> = ({handleChangeMenuStaff, handleChangeBrandIdSelect, setShowOrderList}) => {
     const [brands, setBrands] = useState<Brand[]>([]);
     useEffect(() => {
         getAllBrands().then((data) => {
@@ -34,7 +35,7 @@ const NavStaff: React.FC<NavStaffInterface> = ({handleChangeMenuStaff, handleCha
     };
     return (
         <div className={'nav-staff'}>
-            <div onClick={() => changeMenu('listProduct')} className="nav-staff-item">
+            <div onClick={() => {changeMenu('listProduct'); setShowOrderList(false)}} className="nav-staff-item">
                 製品リスト
             </div>
 
@@ -53,9 +54,13 @@ const NavStaff: React.FC<NavStaffInterface> = ({handleChangeMenuStaff, handleCha
                 </Dropdown.Menu>
             </Dropdown>
 
-            <div onClick={() => changeMenu('user')} className="nav-staff-item">
+            <div  onClick={() => changeMenu('user')} className="nav-staff-item">
                 顧客リスト
             </div>
+            <div  onClick={() => setShowOrderList(true)} className="nav-staff-item">
+                Quản lý đơn hàng
+            </div>
+
 
         </div>
     )

@@ -48,11 +48,6 @@ const Order: React.FC<OrderInterface> = ({cartResult, showOrderScreen, setShowOr
                 destination: '/app/add-order',
                 body: messageCartSend
             });
-            setShowCartScreen(false);
-            setShowOrderScreen(false);
-            setReloadPage(true);
-            navigate("/user/home");
-            alert('Bạn đã đặt đơn hàng thành công. Chúng tôi đang xử lý đơn hàng của bạn.')
         }
     }
 

@@ -10,11 +10,13 @@ import {faTrash} from "@fortawesome/free-solid-svg-icons";
 import CartResponse from "../../model/CartResponse";
 import ModalUploadProduct from "./ModalUploadProduct";
 import * as XLSX from 'xlsx';
+import OrderListMgmt from "./OrderListMgmt";
 
 
 function StaffHome() {
     const [actionModalCreateUpdate, setActionModalCreateUpdate] = useState(false);
     const [showEditImageForm, setShowEditImageForm] = useState(false);
+    const [showOrderList, setShowOrderList] = useState(false);
     const [menuStaff, setMenuStaff] = useState<string>('listProduct');
     const [products, setProducts] = useState<Product[]>([]);
     const [brandId, setBrandId] = useState(0);
@@ -115,6 +117,31 @@ function StaffHome() {
         }
     }
 
+    const deleteMultipleProduct = async () => {
+        try {
+            const url: string = `http://localhost:8083/staff-api/deleteMultipleProducts?productIds=${selectedProductIds}`;
+            const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (response.ok) {
+                alert('Xóa sản phẩm thành công');
+                setActionModalCreateUpdate(true);
+                setSelectedProductIds([]);
+            } else {
+                console.log(response.json());
+                alert('Xóa sửa sản phẩm lỗi');
+            }
+        } catch (error) {
+            alert('Xóa sửa sản phẩm lỗi');
+        }
+    }
+
     const closeModalUpload = () => {
         setShowModalUploadProduct(false);
     }
@@ -202,11 +229,12 @@ function StaffHome() {
             }} setReloadPage={() => {
             }} cartResponse={cartResponse} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
             <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
-                      handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
+                      handleChangeBrandIdSelect={handleChangeBrandIdSelect}
+                      setShowOrderList={setShowOrderList}  />
             <div className="staff-home-content">
                 <div className="staff-home-left"></div>
                 <div className="staff-home-middle">
-                    <div hidden={menuStaff !== 'listProduct'} className="staff-home-middle-list">
+                    <div hidden={menuStaff !== 'listProduct' || showOrderList} className="staff-home-middle-list">
                         <div className="staff-home-middle-header">
                             <h3>製品リスト</h3>
                             <div className={'staff-home-middle-header-btn'}>
@@ -217,7 +245,11 @@ function StaffHome() {
                                 <input ref={fileInputRefEdit} hidden required type="file"
                                        className="form-control" id="imageProductEdit"
                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onExcelFileChange(e, 'edit')}/>
-                                <button hidden={selectedProductIds.length === 0} style={{marginRight : '10px'}} className={'btn btn-danger'}>Xóa tất cả</button>
+                                <button onClick={() => {
+                                    deleteMultipleProduct()
+                                }} hidden={selectedProductIds.length === 0} style={{marginRight: '10px'}}
+                                        className={'btn btn-danger'}>Xóa tất cả
+                                </button>
 
                                 <button style={{marginRight: '10px'}} className={'btn btn-success'}
                                         onClick={handleEditProductByExcel}>Excelファイルから製品の数量を更新する
@@ -322,7 +354,7 @@ function StaffHome() {
                                 displayedProducts.length > 0 ? (displayedProducts.map((product, index) => (
                                     <tr key={product.productId}>
                                         <td><input type="checkbox"
-                                                   onChange={(e : ChangeEvent<HTMLInputElement>) => handleCheckboxChange(product.productId ? product.productId : 0, e.target.checked)}
+                                                   onChange={(e: ChangeEvent<HTMLInputElement>) => handleCheckboxChange(product.productId ? product.productId : 0, e.target.checked)}
                                                    checked={selectedProductIds.includes(product.productId ? product.productId : 0)}/>
                                         </td>
                                         <td scope="row">{index + 1}</td>
@@ -362,6 +394,9 @@ function StaffHome() {
                             </tbody>
                         </table>
 
+                    </div>
+                    <div hidden={!showOrderList}>
+                        <OrderListMgmt />
                     </div>
 
                 </div>

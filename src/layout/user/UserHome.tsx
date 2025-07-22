@@ -84,6 +84,18 @@ function UserHome() {
                     }
                     setCartResults(cartResponse);
                 });
+                stompClient.subscribe('/topic/messageResponse', (message) => {
+                    const response = JSON.parse(message.body);
+                    console.log(response);
+                    alert(response.message);
+                });
+                stompClient.subscribe('/topic/order', (message) => {
+                    const response = JSON.parse(message.body);
+                    setShowCartScreen(false);
+                    setShowOrderScreen(false);
+                    setReloadPage(true);
+                    alert(response.message);
+                });
             },
             webSocketFactory: () => {
                 return new SockJS('http://localhost:8083/ws');
@@ -277,8 +289,11 @@ function UserHome() {
                                             price={product.productOriginalPrice ? product.productOriginalPrice : 1000}
                                             percent={product.productPercent ? product.productPercent : 0}/>
                                     </div>
-                                    <div style={{ color: product.quantity  && product.quantity > 10 ? 'green' : product.quantity && product.quantity > 0 ? 'orange' : 'red' , fontSize : '15px', fontWeight: '400', lineHeight: 'normal'}} className="user-home-middle-item-quantity">
+                                    <div hidden={product.quantity === 0} style={{ color: product.quantity  && product.quantity > 10 ? 'green' : product.quantity && product.quantity > 0 ? 'orange' : 'red' , fontSize : '15px', fontWeight: '400', lineHeight: 'normal'}} className="user-home-middle-item-quantity">
                                        Còn lại:  {product.quantity} ({product.productUnit?.productUnitName})
+                                    </div>
+                                    <div style={{color : 'red' , fontWeight: '500', lineHeight : 'normal'}} hidden={product.quantity != undefined &&  product.quantity > 0} className="user-home-middle-item-quantity">
+                                       Hết hàng
                                     </div>
                                     <div className="user-home-middle-item-productNm">
                                         {product.productName}
@@ -303,7 +318,7 @@ function UserHome() {
                                                 +
                                             </button>
                                         </div>
-                                        <button
+                                        <button disabled={product.quantity === 0} style={product.quantity === 0 ? {cursor : 'not-allowed'} : {cursor : 'pointer'}}
                                             hidden={checkProductCartExist(product.productId ? product.productId : 0) != 0}
                                             title={'カートに追加します'}
                                             onClick={() => addCart(product.productId ? product.productId : 0)}
