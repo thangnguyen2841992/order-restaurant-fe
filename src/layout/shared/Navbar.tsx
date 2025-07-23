@@ -1,21 +1,25 @@
 import React, {useEffect} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faHeart, faSearch, faShoppingCart} from "@fortawesome/free-solid-svg-icons";
+import {faBell, faHeart, faSearch, faShoppingCart} from "@fortawesome/free-solid-svg-icons";
 import {getUserToken, isTokenExpired} from "../../api/Public-Api";
 import {useNavigate} from "react-router-dom";
 import {Dropdown} from "react-bootstrap";
 import CartResponse from "../../model/CartResponse";
+import Notification from "../../model/Notification";
 
 interface NavbarInterface {
-    cartResponse: CartResponse
-    handleShowHideCartArea: (value: boolean) => void
-    setShowCartScreen: (value: boolean) => void
-    setShowOrderScreen: (value: boolean) => void
+    cartResponse: CartResponse;
+    notifications : Notification[];
+    totalNotification : number;
+    handleShowHideCartArea: (value: boolean) => void;
+    setShowCartScreen: (value: boolean) => void;
+    setShowOrderScreen: (value: boolean) => void;
+    setShowNotificationArea: (value: boolean) => void;
     setReloadPage : (value : boolean) => void;
 
 }
 
-const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea, setShowCartScreen, setReloadPage, setShowOrderScreen}) => {
+const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea, setShowCartScreen, setReloadPage, setShowOrderScreen, totalNotification, notifications, setShowNotificationArea}) => {
     const navigate = useNavigate();
     const fullName = getUserToken().fullName;
     const userToken = getUserToken();
@@ -67,8 +71,15 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
                 <button hidden={!getUserToken().isUser} id={'btnLikeProduct'} title={'お気に入り'}>
                     <FontAwesomeIcon icon={faHeart}/>
                 </button>
+                <div className={'notification-area'}>
+                    <button onClick={() => {setShowNotificationArea(true); handleShowHideCartArea(false)}}  id={'btnNotification'} title={'Notification'}>
+                        <FontAwesomeIcon icon={faBell}/>
+                    </button>
+                    <span style={{fontWeight:'500',fontSize:'14px', display : 'flex',justifyContent:'center', alignItems: 'center', position : 'absolute', top : '5px', right: '16px', width : '20px', height : '20px', background: 'red', borderRadius:'50%', color:'#fff'}}>{totalNotification}</span>
+                </div>
+
                 <div hidden={!getUserToken().isUser} className={'cart-area'}
-                     onClick={() => handleShowHideCartArea(true)}>
+                     onClick={() => {handleShowHideCartArea(true); setShowNotificationArea(false)}}>
                     <button id={'btnCartProduct'} title={'ショッピングカート'}>
                         <FontAwesomeIcon icon={faShoppingCart}/>
                     </button>
@@ -83,7 +94,7 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item onClick={logout} eventKey="Option 1">ログアウト</Dropdown.Item>
-                        <Dropdown.Item onClick={logout} eventKey="Option 2">Quản lý đơn hàng</Dropdown.Item>
+                        <Dropdown.Item hidden={!getUserToken().isUser} onClick={logout} eventKey="Option 2">Quản lý đơn hàng</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </div>

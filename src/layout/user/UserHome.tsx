@@ -3,30 +3,34 @@ import NavUser from "./NavUser";
 import React, {useEffect, useState} from "react";
 import {getAllProductsOfBrand} from "../../api/Staff-Api";
 import Product from "../../model/Product";
-import {getAllProductsUser} from "../../api/User-Api";
+import {getAllNotificationUser, getAllProductsUser} from "../../api/User-Api";
 import ImgProductUser from "./ImgProductUser";
 import PriceOriginComponent from "./PriceOriginComponent";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHeart, faShoppingCart, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {Client} from "@stomp/stompjs";
 import SockJS from 'sockjs-client';
-import {getUserToken} from "../../api/Public-Api";
+import {formatDateTime, getUserToken} from "../../api/Public-Api";
 import CartResponse from "../../model/CartResponse";
 import {getCartResponseOfUserId} from "../../api/Cart-Api";
 import CartDetailItem from "./CartDetailItem";
 import CartScreen from "./CartScreen";
 import {useNavigate} from "react-router-dom";
 import Order from "./Order";
+import Notification from "../../model/Notification";
 
 
 function UserHome() {
     const [menuStaff, setMenuStaff] = useState<string>('listProduct');
     const [brandId, setBrandId] = useState(0);
+    const [totalNotification, setTotalNotification] = useState(0);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [brandName, setBrandName] = useState('新鮮な食べ物');
     const [products, setProducts] = useState<Product[]>([]);
     const [cartResults, setCartResults] = useState<CartResponse>({});
     const userTokenId = getUserToken().userId;
     const [showCartArea, setShowCartArea] = useState(false);
+    const [showNotificationArea, setShowNotificationArea] = useState(false);
     const [showCartScreen, setShowCartScreen] = useState(false);
     const [showOrderScreen, setShowOrderScreen] = useState(false);
     const [reloadPage, setReloadPage] = useState(false);
@@ -92,9 +96,30 @@ function UserHome() {
                 stompClient.subscribe('/topic/order', (message) => {
                     const response = JSON.parse(message.body);
                     setShowCartScreen(false);
+                    setShowNotificationArea(false);
                     setShowOrderScreen(false);
                     setReloadPage(true);
                     alert(response.message);
+                });
+
+                stompClient.subscribe('/topic/userNotification', (message) => {
+                    const response = JSON.parse(message.body);
+                    console.log(response);
+                    if (response.toUserId === getUserToken().userId) {
+                        const notification : Notification = {
+                            notificationId : response.notificationId,
+                            toUserId : response.toUserId,
+                            orderId : response.orderId,
+                            message : response.message,
+                            dateCreated : response.dateCreated,
+                            isStaff : response.staff
+                        }
+                        setNotifications(prevNotifications => {
+                            const updatedNotifications = [notification, ...prevNotifications];
+                            setTotalNotification(updatedNotifications.length);
+                            return updatedNotifications;
+                        });
+                    }
                 });
             },
             webSocketFactory: () => {
@@ -111,6 +136,12 @@ function UserHome() {
     }, []);
 
     useEffect(() => {
+        getAllNotificationUser().then((data) => {
+            setNotifications(data);
+            setTotalNotification(data.length);
+        }).catch((error) => {
+            console.log(error);
+        })
         getCartResponseOfUserId().then((data) => {
             setCartResults(data);
         }).catch((error) => {
@@ -177,8 +208,9 @@ function UserHome() {
 
     return (
         <div className={'user-home-area'}>
-            <Navbar  setReloadPage={setReloadPage} setShowOrderScreen={setShowOrderScreen} cartResponse={cartResults} handleShowHideCartArea={setShowCartArea} setShowCartScreen={setShowCartScreen}/>
-            <div onClick={() => setShowCartArea(false)} className="user-home-content">
+            <Navbar setShowNotificationArea={setShowNotificationArea} notifications={notifications} totalNotification={totalNotification} setReloadPage={setReloadPage} setShowOrderScreen={setShowOrderScreen} cartResponse={cartResults}
+                    handleShowHideCartArea={setShowCartArea} setShowCartScreen={setShowCartScreen}/>
+            <div onClick={() => {setShowCartArea(false); setShowNotificationArea(false)}} className="user-home-content">
                 <NavUser handleChangeMenuUser={handleChangeMenuUser}
                          handleChangeBrandIdSelect={handleChangeBrandIdSelect}/>
                 <div hidden={showCartScreen || showOrderScreen} className={'user-home-detail'}>
@@ -279,21 +311,28 @@ function UserHome() {
                                     <div className="user-home-middle-item-img">
                                         <ImgProductUser productId={product.productId ? product.productId : 0}/>
                                     </div>
-                                        <div className="user-home-middle-item-price">
-                                            {product.productPrice?.toLocaleString()}
-                                            <u>¥</u> / {product.productUnit?.productUnitName}
-                                        </div>
+                                    <div className="user-home-middle-item-price">
+                                        {product.productPrice?.toLocaleString()}
+                                        <u>¥</u> / {product.productUnit?.productUnitName}
+                                    </div>
 
                                     <div className="user-home-middle-item-price-origin">
                                         <PriceOriginComponent
                                             price={product.productOriginalPrice ? product.productOriginalPrice : 1000}
                                             percent={product.productPercent ? product.productPercent : 0}/>
                                     </div>
-                                    <div hidden={product.quantity === 0} style={{ color: product.quantity  && product.quantity > 10 ? 'green' : product.quantity && product.quantity > 0 ? 'orange' : 'red' , fontSize : '15px', fontWeight: '400', lineHeight: 'normal'}} className="user-home-middle-item-quantity">
-                                       Còn lại:  {product.quantity} ({product.productUnit?.productUnitName})
+                                    <div hidden={product.quantity === 0} style={{
+                                        color: product.quantity && product.quantity > 10 ? 'green' : product.quantity && product.quantity > 0 ? 'orange' : 'red',
+                                        fontSize: '15px',
+                                        fontWeight: '400',
+                                        lineHeight: 'normal'
+                                    }} className="user-home-middle-item-quantity">
+                                        Còn lại: {product.quantity} ({product.productUnit?.productUnitName})
                                     </div>
-                                    <div style={{color : 'red' , fontWeight: '500', lineHeight : 'normal'}} hidden={product.quantity != undefined &&  product.quantity > 0} className="user-home-middle-item-quantity">
-                                       Hết hàng
+                                    <div style={{color: 'red', fontWeight: '500', lineHeight: 'normal'}}
+                                         hidden={product.quantity != undefined && product.quantity > 0}
+                                         className="user-home-middle-item-quantity">
+                                        Hết hàng
                                     </div>
                                     <div className="user-home-middle-item-productNm">
                                         {product.productName}
@@ -318,11 +357,12 @@ function UserHome() {
                                                 +
                                             </button>
                                         </div>
-                                        <button disabled={product.quantity === 0} style={product.quantity === 0 ? {cursor : 'not-allowed'} : {cursor : 'pointer'}}
-                                            hidden={checkProductCartExist(product.productId ? product.productId : 0) != 0}
-                                            title={'カートに追加します'}
-                                            onClick={() => addCart(product.productId ? product.productId : 0)}
-                                            type={'button'} className={'btn btn-danger'}><FontAwesomeIcon
+                                        <button disabled={product.quantity === 0}
+                                                style={product.quantity === 0 ? {cursor: 'not-allowed'} : {cursor: 'pointer'}}
+                                                hidden={checkProductCartExist(product.productId ? product.productId : 0) != 0}
+                                                title={'カートに追加します'}
+                                                onClick={() => addCart(product.productId ? product.productId : 0)}
+                                                type={'button'} className={'btn btn-danger'}><FontAwesomeIcon
                                             icon={faShoppingCart}/></button>
                                     </div>
                                     <div hidden={product.point == 0} className="user-home-middle-item-point-area">
@@ -342,11 +382,15 @@ function UserHome() {
                 {
                     cartResults.productCartList && cartResults.productCartList.length > 0 ?
                         (
-                            <div  className={'cart-screen'}>
-                                <CartScreen setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen} showCartScreen={showCartScreen}  cartResponse={cartResults} client={client ? client : new Client()}
+                            <div className={'cart-screen'}>
+                                <CartScreen setShowCartScreen={setShowCartScreen}
+                                            setShowOrderScreen={setShowOrderScreen} showCartScreen={showCartScreen}
+                                            cartResponse={cartResults} client={client ? client : new Client()}
                                             editQuantity={editQuantity}
                                             deleteAllProductOfCart={deleteAllProductOfCart}/>
-                                <Order setReloadPage={setReloadPage} client={client ? client : new Client()} cartResult={cartResults} showOrderScreen={showOrderScreen} setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen}/>
+                                <Order setReloadPage={setReloadPage} client={client ? client : new Client()}
+                                       cartResult={cartResults} showOrderScreen={showOrderScreen}
+                                       setShowCartScreen={setShowCartScreen} setShowOrderScreen={setShowOrderScreen}/>
                             </div>
 
                         ) :
@@ -359,11 +403,48 @@ function UserHome() {
                                     Không có sản phẩm nào trong giỏ hàng
                                 </div>
                                 <div className="cart-screen-no-content-btn">
-                                    <button onClick={() => navigate('/user/home')} className={'btn btn-primary'}>Trang chủ</button>
+                                    <button onClick={() => navigate('/user/home')} className={'btn btn-primary'}>Trang
+                                        chủ
+                                    </button>
                                 </div>
                             </div>
                         )
                 }
+            </div>
+            <div hidden={!showNotificationArea} className={'notification-detail-area'}>
+                <div className="cart-detail-area-header">
+                    <div className="cart-detail-area-header-left">
+                        <div className="cart-detail-area-header-left-title">
+                            Thông báo
+                        </div>
+                        <div className="cart-detail-area-header-left-des">
+                            ({totalNotification} thông báo)
+                        </div>
+                    </div>
+                    <div className="cart-detail-area-header-right" onClick={() => setShowNotificationArea(false)}>
+                        <div className={'cart-detail-area-header-right-text'}>
+                            Đóng
+                        </div>
+                        <div className={'cart-detail-area-header-right-icon'}>
+                            <FontAwesomeIcon icon={faTimes}/>
+                        </div>
+                    </div>
+                </div>
+                <div style={{marginTop : '10px'}} className="notification-detail-area-content">
+                    {
+                        notifications.map((notification) => (
+                            <div className="notification-detail-area-content-item">
+                                <div className="notification-detail-area-content-item-top">
+                                    {notification.message}
+                                </div>
+                                <div className="notification-detail-area-content-item-bottom">
+                                    {formatDateTime(notification.dateCreated ? notification.dateCreated : '')}
+                                </div>
+                            </div>
+                        ))
+                    }
+
+                </div>
             </div>
             <div className="cart-detail-area" hidden={!showCartArea}>
                 <div className="cart-detail-area-header">
@@ -422,7 +503,8 @@ function UserHome() {
                 </div>
                 <button onClick={() => {
                     setShowCartScreen(true);
-                    setShowCartArea(false)
+                    setShowCartArea(false);
+                    setShowNotificationArea(false);
                 }} hidden={(!cartResults.productCartList || cartResults.productCartList.length === 0)} id={'see-cart'}
                         className={'btn btn-primary'}>Xem giỏ hàng
                 </button>

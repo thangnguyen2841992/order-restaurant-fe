@@ -128,7 +128,9 @@ function Login() {
                             alignItems: 'center',
                             marginTop: '10px'
                         }}>
-                            <small className={'policy-content'}
+                            <small onClick={() => {
+                                navigate('/find-password')
+                            }} className={'policy-content'}
                                    style={{color: '#0272ba', marginLeft: '5px', fontWeight: '500'}}> Quên mật
                                 khẩu?</small>
                         </label>

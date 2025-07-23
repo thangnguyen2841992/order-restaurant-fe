@@ -12,11 +12,38 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
     const [orders, setOrders] = React.useState<OrderResponse[]>([]);
     const [productOrders, setProductOrders] = React.useState<ProductOrder[]>([]);
     const [showOrderProduct, setShowOrderProduct] = React.useState(false);
+    const [reloadOrder, setReloadOrder] = React.useState(false);
+    const token = localStorage.getItem('token');
+
+    const processOrder = async (orderId : number, type : string) => {
+        try {
+            const url: string = type === 'process' ? `http://localhost:8083/staff-api/process-order?orderId=${orderId}` :  `http://localhost:8083/staff-api/done-order?orderId=${orderId}`;
+            const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (response.ok) {
+                setReloadOrder(true);
+                alert('Cập nhât process thành công');
+            } else {
+                console.log(response.json());
+                alert('Đã xảy ra lỗi trong quá trình cập nhật process');
+            }
+        } catch (error) {
+            alert('Đã xảy ra lỗi trong quá trình cập nhật process');
+        }
+    }
 
     const processStr = (order: OrderResponse) => {
-        if (order.isProcess) {
+        if (order.isProcess && !order.isDone) {
             return 'Đang xử lý';
-        } else if (order.isDone) {
+        }
+        if (order.isDone) {
             return 'Hoàn thành';
         }
         return 'Đang chờ';
@@ -28,13 +55,17 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
         }).catch((error) => {
             console.log(error);
         })
-    }, []);
+        setReloadOrder(false);
+    }, [reloadOrder]);
     return (
         <div className={'order-list-mgmt'}>
             <div className="staff-home-middle-header">
                 <h3>DANH SÁCH ĐƠN HÀNG </h3>
-                <div className={'staff-home-middle-header-btn'}>
+                <div className={'staff-home-middle-header-filter'}>
 
+                </div>
+                <div className={'staff-home-middle-header-btn'}>
+                    <button onClick={() => {setReloadOrder(true)}} className={'btn btn-primary'}>Làm mới trang web</button>
                 </div>
             </div>
             <table className="table table-bordered">
@@ -74,7 +105,11 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                                 </td>
                             <td onClick={() => {setShowOrderProduct(true); setProductOrders(order.productOrder ? order.productOrder : [])}} style={{color: "blue", cursor: 'pointer'}}>Ấn để xem</td>
                             <td>{order.description}</td>
-                            <td><button className={'btn btn-success'}>Xử lý</button></td>
+                            <td>
+                                <button hidden={order.isProcess} onClick={() => {processOrder(order.orderId ? order.orderId : 0, 'process')}} className={'btn btn-success'}>Xử lý</button>
+                                <button hidden={!order.isProcess || (order.isProcess && order.isDone)} onClick={() => {processOrder(order.orderId ? order.orderId : 0, 'done')}} className={'btn btn-primary'}>Done</button>
+
+                            </td>
                         </tr>
                     ))) : (
                         <tr>

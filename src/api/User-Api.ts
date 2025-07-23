@@ -1,5 +1,6 @@
 import Product from "../model/Product";
-import {myRequestToken} from "./Public-Api";
+import {getUserToken, myRequestToken} from "./Public-Api";
+import Notification from "../model/Notification";
 
 export async function getAllProductsUser(): Promise<Product[]> {
     let url: string = `http://localhost:8083/user-api/getAllProducts`;
@@ -30,6 +31,28 @@ export async function getAllProductsUser(): Promise<Product[]> {
     }
 
     return products;
+}
+
+export async function getAllNotificationUser(): Promise<Notification[]> {
+    let url: string = `http://localhost:8083/user-api/getAllNotificationsOfUser?userId=${getUserToken().userId}`;
+
+    const responseData = await myRequestToken(url);
+
+    let notifications: Notification[] = [];
+
+    for (const key in responseData) {
+        notifications.push(
+            {
+                notificationId: responseData[key].notificationId,
+                toUserId: responseData[key].toUserId,
+                orderId: responseData[key].orderId,
+                message: responseData[key].message,
+                isStaff: responseData[key].staff,
+            }
+        );
+    }
+
+    return notifications;
 }
 
 const calculateDiscountedPrice = (price: number): { discountedPrice: number; discountPercentage: number } => {

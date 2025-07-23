@@ -6,15 +6,20 @@ import {getAllUsers} from "../../api/Admin-Api";
 import {formatDate, formatDateTime} from "../../api/Public-Api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBan, faCheck} from "@fortawesome/free-solid-svg-icons";
-import ProductCart from "../../model/ProductCart";
 import CartResponse from "../../model/CartResponse";
+import Notification from "../../model/Notification";
 
 function AdminHome() {
     const [users, setUsers] = useState<User[]>([])
     const [menuAdmin, setMenuAdmin] = useState<string>('staff')
+    const [showNotificationArea, setShowNotificationArea] = useState(false);
+
     const handleChangeMenuAdmin = (value: string) => {
         setMenuAdmin(value);
     };
+
+    const [totalNotification, setTotalNotification] = useState(0);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
 
     const [cartResults, setCartResults] = useState<CartResponse>({});
 
@@ -163,7 +168,7 @@ function AdminHome() {
     },[menuAdmin])
     return (
         <div className={'admin-home-area'}>
-            <Navbar setShowOrderScreen={() => {}} setReloadPage={() => {}} cartResponse={cartResults} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
+            <Navbar setShowNotificationArea={setShowNotificationArea} totalNotification={totalNotification} notifications={notifications} setShowOrderScreen={() => {}} setReloadPage={() => {}} cartResponse={cartResults} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
             <NavAdmin handleChangeMenuAdmin={handleChangeMenuAdmin} />
             <div className="admin-home-content">
                 <div className="admin-home-left">

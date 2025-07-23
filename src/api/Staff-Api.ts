@@ -1,5 +1,6 @@
 import {myRequestToken} from "./Public-Api";
 import Product from "../model/Product";
+import Notification from "../model/Notification";
 
 export async function getAllProducts(): Promise<Product[]> {
     let url: string = `http://localhost:8083/staff-api/getAllProducts`;
@@ -58,6 +59,29 @@ export async function getAllProductsOfBrand(brandId: number): Promise<Product[]>
     return products;
 }
 
+export async function getAllNotificationsOfStaff(): Promise<Notification[]> {
+    let url: string = `http://localhost:8083/staff-api/getAllNotificationsOfStaff`;
+
+    const responseData = await myRequestToken(url);
+
+    let notifications: Notification[] = [];
+
+    for (const key in responseData) {
+        notifications.push(
+            {
+                notificationId: responseData[key].notificationId,
+                toUserId: responseData[key].toUserId,
+                orderId: responseData[key].orderId,
+                message: responseData[key].message,
+                isStaff: responseData[key].staff,
+            }
+        );
+    }
+
+    return notifications;
+}
+
+
 export async function getProductByProductId(productId: number): Promise<Product> {
     let url: string = `http://localhost:8083/staff-api/getProductById?productId=${productId}`;
 
@@ -77,3 +101,5 @@ export async function getProductByProductId(productId: number): Promise<Product>
 
     };
 }
+
+

@@ -8,6 +8,7 @@ import Login from "./layout/auth/Login";
 import AdminHome from "./layout/admin/AdminHome";
 import StaffHome from "./layout/staff/StaffHome";
 import UserHome from "./layout/user/UserHome";
+import FindPassword from "./layout/auth/FindPassword";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
                   <Route path = "/active/:userId/:activeCode" element={<ActiveCode/>}></Route>
                   <Route path = "/register" element={<Register/>}></Route>
                   <Route path = "/login" element={<Login/>}></Route>
+                  <Route path = "/find-password" element={<FindPassword/>}></Route>
                   <Route path = "/admin/home" element={<AdminHome/>}></Route>
                   <Route path = "/staff/home" element={<StaffHome/>}></Route>
                   <Route path = "/user/home" element={<UserHome/>}></Route>

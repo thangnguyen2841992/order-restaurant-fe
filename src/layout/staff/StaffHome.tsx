@@ -11,9 +11,13 @@ import CartResponse from "../../model/CartResponse";
 import ModalUploadProduct from "./ModalUploadProduct";
 import * as XLSX from 'xlsx';
 import OrderListMgmt from "./OrderListMgmt";
+import Notification from "../../model/Notification";
+
 
 
 function StaffHome() {
+    const [totalNotification, setTotalNotification] = useState(0);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [actionModalCreateUpdate, setActionModalCreateUpdate] = useState(false);
     const [showEditImageForm, setShowEditImageForm] = useState(false);
     const [showOrderList, setShowOrderList] = useState(false);
@@ -32,6 +36,8 @@ function StaffHome() {
     const [showModalUploadProduct, setShowModalUploadProduct] = useState(false);
     const [dataUpload, setDataUpload] = useState<any[]>([]);
     const [typeUpload, setTypeUpload] = useState<string>('create');
+    const [showNotificationArea, setShowNotificationArea] = useState(false);
+
     const handleUploadExcel = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
@@ -225,7 +231,7 @@ function StaffHome() {
     }, [brandId, actionModalCreateUpdate])
     return (
         <div className={'staff-home-area'}>
-            <Navbar setShowOrderScreen={() => {
+            <Navbar setShowNotificationArea={setShowNotificationArea} totalNotification={totalNotification} notifications={notifications} setShowOrderScreen={() => {
             }} setReloadPage={() => {
             }} cartResponse={cartResponse} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
             <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}

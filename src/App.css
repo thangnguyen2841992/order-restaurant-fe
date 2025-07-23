@@ -73,7 +73,7 @@
     margin-right: 10px;
 }
 
-#btnLikeProduct, #btnCartProduct {
+#btnLikeProduct, #btnCartProduct, #btnNotification {
     font-size: 20px;
     width: 50px;
     height: 50px;
@@ -84,11 +84,11 @@
     background-color: #003568;
 }
 
-.register-screen-area, .login-screen-area {
+.register-screen-area, .login-screen-area,.find-password-area  {
     height: 100vh;
 }
 
-.register-area, .login-area {
+.register-area, .login-area,.find-password-content {
     height: 100%;
     background-image: url("/public/bg-login-vdF.jpg");
     background-size: cover;
@@ -98,12 +98,15 @@
     align-items: center;
 }
 
-.register-area-content, .login-area-content, .admin-home-middle-form {
+.register-area-content, .login-area-content, .admin-home-middle-form, .find-password-content-area {
     width: 500px;
     height: 80%;
     background: #ffffff;
     border-radius: 10px;
     padding: 20px 30px;
+}
+.find-password-content-area {
+    height: 30%;
 }
 
 .register-area-content {
@@ -666,7 +669,7 @@ td {
     font-weight: bold;
 }
 
-.cart-detail-area {
+.cart-detail-area, .notification-detail-area {
     position: fixed;
     top: 80px;
     right: 0;
@@ -677,6 +680,7 @@ td {
     background-color: #fff;
     padding: 20px;
     box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.5); /* Đổ bóng */
+    overflow-y: auto;
 
 }
 
@@ -1010,4 +1014,24 @@ textarea {
     max-height: 320px;
     overflow-y: auto;
     margin-bottom: 10px;
+}
+.find-password-content-header {
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+.notification-area {
+    position: relative;
+}
+.notification-detail-area-content-item {
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.notification-detail-area-content-item-top {
+    font-weight: 500;
+}
+.notification-detail-area-content-item-bottom {
+    font-size: 13px;
 }
