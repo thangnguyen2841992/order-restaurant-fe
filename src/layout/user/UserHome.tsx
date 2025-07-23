@@ -18,6 +18,7 @@ import CartScreen from "./CartScreen";
 import {useNavigate} from "react-router-dom";
 import Order from "./Order";
 import Notification from "../../model/Notification";
+import NotificationDetail from "./NotificationDetail";
 
 
 function UserHome() {
@@ -411,41 +412,7 @@ function UserHome() {
                         )
                 }
             </div>
-            <div hidden={!showNotificationArea} className={'notification-detail-area'}>
-                <div className="cart-detail-area-header">
-                    <div className="cart-detail-area-header-left">
-                        <div className="cart-detail-area-header-left-title">
-                            Thông báo
-                        </div>
-                        <div className="cart-detail-area-header-left-des">
-                            ({totalNotification} thông báo)
-                        </div>
-                    </div>
-                    <div className="cart-detail-area-header-right" onClick={() => setShowNotificationArea(false)}>
-                        <div className={'cart-detail-area-header-right-text'}>
-                            Đóng
-                        </div>
-                        <div className={'cart-detail-area-header-right-icon'}>
-                            <FontAwesomeIcon icon={faTimes}/>
-                        </div>
-                    </div>
-                </div>
-                <div style={{marginTop : '10px'}} className="notification-detail-area-content">
-                    {
-                        notifications.map((notification) => (
-                            <div className="notification-detail-area-content-item">
-                                <div className="notification-detail-area-content-item-top">
-                                    {notification.message}
-                                </div>
-                                <div className="notification-detail-area-content-item-bottom">
-                                    {formatDateTime(notification.dateCreated ? notification.dateCreated : '')}
-                                </div>
-                            </div>
-                        ))
-                    }
-
-                </div>
-            </div>
+            <NotificationDetail notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
             <div className="cart-detail-area" hidden={!showCartArea}>
                 <div className="cart-detail-area-header">
                     <div className="cart-detail-area-header-left">

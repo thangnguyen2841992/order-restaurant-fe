@@ -205,21 +205,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.staff-home-middle-header h3 {
-    font-size: 20px; /* Kích thước chữ lớn */
-    font-weight: bold; /* Đậm chữ */
-    color: #3498db; /* Màu chữ */
-    text-align: center; /* Canh giữa */
-    text-transform: uppercase; /* Chữ hoa toàn bộ */
-    letter-spacing: 2px; /* Khoảng cách giữa các chữ */
-    padding: 20px; /* Khoảng cách xung quanh chữ */
-    border-bottom: 2px solid #3498db; /* Viền dưới */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Đổ bóng */
-    margin: 20px 0; /* Khoảng cách trên và dưới */
-    background-color: rgba(255, 255, 255, 0.8); /* Nền mờ */
-    border-radius: 5px; /* Bo tròn góc */
+    margin : 10px 0;
 }
 
 td {
@@ -1034,4 +1020,37 @@ textarea {
 }
 .notification-detail-area-content-item-bottom {
     font-size: 13px;
+}
+.staff-home-middle-header-filter {
+    display: flex;
+    flex-direction: column;
+    padding: 10px ;
+    background-color: #fff;
+    width: 100%;
+    border-radius: 10px;
+}
+.staff-home-middle-header-filter-top, .staff-home-middle-header-filter-bottom {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.staff-home-middle-header-filter-bottom {
+    margin-top: 20px;
+}
+.staff-home-middle-header-filter-user {
+    margin-right: 10px;
+}
+.staff-home-middle-header-filter-user label {
+    font-weight: 500;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.staff-home-middle-header input, .staff-home-middle-header select {
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+    outline: none;
+    width: 200px;
 }

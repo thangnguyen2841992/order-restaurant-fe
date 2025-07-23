@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import OrderResponse from "../../model/OrderResponse";
 import {getAllOrder} from "../../api/Order-Api";
 import {formatDateTime} from "../../api/Public-Api";
@@ -9,10 +9,12 @@ interface OrderListMgmtInterface {
 }
 
 const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
+    const [orderId, setOrderId] = useState<number>(0);
     const [orders, setOrders] = React.useState<OrderResponse[]>([]);
     const [productOrders, setProductOrders] = React.useState<ProductOrder[]>([]);
     const [showOrderProduct, setShowOrderProduct] = React.useState(false);
     const [reloadOrder, setReloadOrder] = React.useState(false);
+    const [openHeight, setOpenHeight] = React.useState(false);
     const token = localStorage.getItem('token');
 
     const processOrder = async (orderId : number, type : string) => {
@@ -60,13 +62,68 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
     return (
         <div className={'order-list-mgmt'}>
             <div className="staff-home-middle-header">
-                <h3>DANH SÁCH ĐƠN HÀNG </h3>
-                <div className={'staff-home-middle-header-filter'}>
+                <div style={openHeight ? {height : '140px'} : {height : '70px'}} className={'staff-home-middle-header-filter'}>
+                    <div className="staff-home-middle-header-filter-top">
+                        <div className="staff-home-middle-header-filter-user">
+                            <label >Người đặt hàng</label>
+                            <input type="text" placeholder={'Người đặt hàng'}/>
+                        </div>
+                        <div className="staff-home-middle-header-filter-user">
+                            <label >Số điện thoại </label>
+                            <input type="text" placeholder={'Số điện thoại'}/>
+                        </div>
+                        <div className="staff-home-middle-header-filter-user">
+                            <label >Vận chuyển</label>
+                            <select name="delivery">
+                                <option  value="0">Tất cả</option>
+                                <option value="1">Giao nhanh 24h</option>
+                                <option value="2">Giao hàng bình thường</option>
+                            </select>
+                        </div>
+                        <div className="staff-home-middle-header-filter-user">
+                            <label >Phương thức thanh toán</label>
+                            <select name="payment">
+                                <option  value="0">Tất cả</option>
+                                <option value="1">Thanh toán khi nhận hàng(COD)</option>
+                                <option value="2">Thanh toán qua ngân hàng</option>
+                            </select>
+                        </div>
+                        <div className="staff-home-middle-header-filter-user">
+                            <label >Giá trị</label>
+                            <select name="price">
+                                <option  value="0">Tất cả</option>
+                                <option value="1">Từ cao đến thấp</option>
+                                <option value="2">Từ thấp đến cao</option>
+                            </select>
+                        </div>
+                        <button hidden={openHeight} onClick={() => {setOpenHeight(true)}} style={{marginLeft : '20px'}} className={'btn btn-success'}>Mở rộng</button>
+                        <button hidden={!openHeight} onClick={() => {setOpenHeight(false)}} style={{marginLeft : '20px'}} className={'btn btn-success'}>Thu gọn</button>
+                    </div>
+                    <div hidden={!openHeight} className="staff-home-middle-header-filter-bottom">
+                        <div className="staff-home-middle-header-filter-user">
+                            <label>Thanh toán</label>
+                            <select name="paymented">
+                                <option  value="0">Tất cả</option>
+                                <option value="1">Đã thanh toán</option>
+                                <option value="2">Chưa thanh toán</option>
+                            </select>
+                        </div>
+                        <div className="staff-home-middle-header-filter-user">
+                            <label>Thanh toán</label>
+                            <select name="process">
+                                <option  value="0">Tất cả</option>
+                                <option value="1">Đang chờ</option>
+                                <option value="2">Đang xử lý</option>
+                                <option value="3">Hoàn thành</option>
+                            </select>
+                        </div>
+                    </div>
+
 
                 </div>
-                <div className={'staff-home-middle-header-btn'}>
-                    <button onClick={() => {setReloadOrder(true)}} className={'btn btn-primary'}>Làm mới trang web</button>
-                </div>
+                {/*<div className={'staff-home-middle-header-btn'}>*/}
+                {/*    <button onClick={() => {setReloadOrder(true)}} className={'btn btn-primary'}>Làm mới trang web</button>*/}
+                {/*</div>*/}
             </div>
             <table className="table table-bordered">
                 <thead>
@@ -103,7 +160,7 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                             <td>{order.isPaymented ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
                             <td>{processStr(order)}
                                 </td>
-                            <td onClick={() => {setShowOrderProduct(true); setProductOrders(order.productOrder ? order.productOrder : [])}} style={{color: "blue", cursor: 'pointer'}}>Ấn để xem</td>
+                            <td onClick={() => {setShowOrderProduct(true); setProductOrders(order.productOrder ? order.productOrder : []); setOrderId(order.orderId ? order.orderId : 0)}} style={{color: "blue", cursor: 'pointer'}}>Ấn để xem</td>
                             <td>{order.description}</td>
                             <td>
                                 <button hidden={order.isProcess} onClick={() => {processOrder(order.orderId ? order.orderId : 0, 'process')}} className={'btn btn-success'}>Xử lý</button>
@@ -132,6 +189,7 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                 show={showOrderProduct}
                 onHide={() => setShowOrderProduct(false)}
                 productorders={productOrders}
+                orderId={orderId}
             />
         </div>
 

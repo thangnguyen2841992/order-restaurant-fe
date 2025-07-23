@@ -17,7 +17,7 @@ function ModalOrderProductDetail(props: any) {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        <strong>Thông tin đơn hàng</strong>
+                        <strong>Thông tin sản phẩm đơn hàng #{props.orderId}</strong>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

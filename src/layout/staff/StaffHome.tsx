@@ -2,7 +2,7 @@ import React, {ChangeEvent, useEffect, useRef, useState} from "react";
 import NavStaff from "./NavStaff";
 import Navbar from "../shared/Navbar";
 import Product from "../../model/Product";
-import {getAllProducts, getAllProductsOfBrand} from "../../api/Staff-Api";
+import {getAllNotificationsOfStaff, getAllProducts, getAllProductsOfBrand} from "../../api/Staff-Api";
 import ImageProduct from "./ImageProduct";
 import ModalCreateNewProduct from "./ModalCreateNewProduct";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -12,6 +12,10 @@ import ModalUploadProduct from "./ModalUploadProduct";
 import * as XLSX from 'xlsx';
 import OrderListMgmt from "./OrderListMgmt";
 import Notification from "../../model/Notification";
+import {Client} from "@stomp/stompjs";
+import {getUserToken} from "../../api/Public-Api";
+import SockJS from "sockjs-client";
+import NotificationDetail from "../user/NotificationDetail";
 
 
 
@@ -37,6 +41,8 @@ function StaffHome() {
     const [dataUpload, setDataUpload] = useState<any[]>([]);
     const [typeUpload, setTypeUpload] = useState<string>('create');
     const [showNotificationArea, setShowNotificationArea] = useState(false);
+    const [client, setClient] = useState<Client>();
+
 
     const handleUploadExcel = () => {
         if (fileInputRef.current) {
@@ -98,6 +104,52 @@ function StaffHome() {
             setSelectedProductIds([]);
         }
     };
+
+    useEffect(() => {
+        const stompClient = new Client({
+            brokerURL: 'ws://localhost:8083/ws',
+            connectHeaders: {
+                login: 'guest',
+                passcode: 'guest',
+            },
+            debug: (str) => {
+                console.log(str);
+            },
+            onConnect: () => {
+
+
+                stompClient.subscribe('/topic/staffNotification', (message) => {
+                    const response = JSON.parse(message.body);
+                    console.log(response);
+                    if (response.toUserId === getUserToken().userId) {
+                        const notification : Notification = {
+                            notificationId : response.notificationId,
+                            toUserId : response.toUserId,
+                            orderId : response.orderId,
+                            message : response.message,
+                            dateCreated : response.dateCreated,
+                            isStaff : response.staff
+                        }
+                        setNotifications(prevNotifications => {
+                            const updatedNotifications = [notification, ...prevNotifications];
+                            setTotalNotification(updatedNotifications.length);
+                            return updatedNotifications;
+                        });
+                    }
+                });
+            },
+            webSocketFactory: () => {
+                return new SockJS('http://localhost:8083/ws');
+            },
+        });
+
+        setClient(stompClient);
+        stompClient.activate();
+
+        return () => {
+            stompClient.deactivate();
+        };
+    }, []);
 
     const deleteProduct = async (productId: number) => {
         try {
@@ -214,6 +266,12 @@ function StaffHome() {
 
 
     useEffect(() => {
+        getAllNotificationsOfStaff().then((data) => {
+            setNotifications(data);
+            setTotalNotification(data.length);
+        }).catch((error) => {
+            console.log(error);
+        })
         if (Number(brandId) !== 0) {
             getAllProductsOfBrand(brandId).then((data) => {
                 setProducts(data);
@@ -234,10 +292,12 @@ function StaffHome() {
             <Navbar setShowNotificationArea={setShowNotificationArea} totalNotification={totalNotification} notifications={notifications} setShowOrderScreen={() => {
             }} setReloadPage={() => {
             }} cartResponse={cartResponse} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
-            <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
-                      handleChangeBrandIdSelect={handleChangeBrandIdSelect}
-                      setShowOrderList={setShowOrderList}  />
-            <div className="staff-home-content">
+            <div onClick={() => {setShowNotificationArea(false)}}>
+                <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
+                          handleChangeBrandIdSelect={handleChangeBrandIdSelect}
+                          setShowOrderList={setShowOrderList}  />
+            </div>
+            <div onClick={() => {setShowNotificationArea(false)}} className="staff-home-content">
                 <div className="staff-home-left"></div>
                 <div className="staff-home-middle">
                     <div hidden={menuStaff !== 'listProduct' || showOrderList} className="staff-home-middle-list">
@@ -408,6 +468,8 @@ function StaffHome() {
                 </div>
                 <div className="staff-home-right"></div>
             </div>
+            <NotificationDetail notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
+
             <ModalCreateNewProduct
                 show={showModalCreatePopup}
                 type={type}
