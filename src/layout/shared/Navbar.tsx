@@ -9,20 +9,31 @@ import Notification from "../../model/Notification";
 
 interface NavbarInterface {
     cartResponse: CartResponse;
-    notifications : Notification[];
-    totalNotification : number;
+    notifications: Notification[];
+    totalNotification: number;
     handleShowHideCartArea: (value: boolean) => void;
     setShowCartScreen: (value: boolean) => void;
+    setType: (value: string) => void;
     setShowOrderScreen: (value: boolean) => void;
     setShowNotificationArea: (value: boolean) => void;
-    setReloadPage : (value : boolean) => void;
+    setReloadPage: (value: boolean) => void;
 
 }
 
-const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea, setShowCartScreen, setReloadPage, setShowOrderScreen, totalNotification, notifications, setShowNotificationArea}) => {
-    const navigate = useNavigate();
+const Navbar: React.FC<NavbarInterface> = ({
+                                               setType,
+                                               cartResponse,
+                                               handleShowHideCartArea,
+                                               setShowCartScreen,
+                                               setReloadPage,
+                                               setShowOrderScreen,
+                                               totalNotification,
+                                               notifications,
+                                               setShowNotificationArea
+                                           }) => {
     const fullName = getUserToken().fullName;
     const userToken = getUserToken();
+    const navigate = useNavigate();
 
     const logout = () => {
         localStorage.removeItem('token');
@@ -61,7 +72,7 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
             <div title={'Trang chủ'} onClick={() => backHomePage()} className="navbar-area-logo">
                 <img onClick={backHomePage} src={'/logo3-removebg-preview.png'} alt=""/>
             </div>
-            <div className="navbar-area-search">
+            <div hidden={!getUserToken().isUser} className="navbar-area-search">
                 <input type="text" placeholder={'どの製品を見つける必要がありますか？'}/>
                 <button className={'btn btn-danger'}>
                     <FontAwesomeIcon icon={faSearch}/>
@@ -72,14 +83,35 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
                     <FontAwesomeIcon icon={faHeart}/>
                 </button>
                 <div className={'notification-area'}>
-                    <button onClick={() => {setShowNotificationArea(true); handleShowHideCartArea(false)}}  id={'btnNotification'} title={'Notification'}>
+                    <button onClick={() => {
+                        setShowNotificationArea(true);
+                        handleShowHideCartArea(false);
+                        setType('user');
+                    }} id={'btnNotification'} title={'Notification'}>
                         <FontAwesomeIcon icon={faBell}/>
                     </button>
-                    <span style={{fontWeight:'500',fontSize:'14px', display : 'flex',justifyContent:'center', alignItems: 'center', position : 'absolute', top : '5px', right: '16px', width : '20px', height : '20px', background: 'red', borderRadius:'50%', color:'#fff'}}>{totalNotification}</span>
+                    <span style={{
+                        fontWeight: '500',
+                        fontSize: '14px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        position: 'absolute',
+                        top: '5px',
+                        right: '16px',
+                        width: '20px',
+                        height: '20px',
+                        background: 'red',
+                        borderRadius: '50%',
+                        color: '#fff'
+                    }}>{totalNotification}</span>
                 </div>
 
                 <div hidden={!getUserToken().isUser} className={'cart-area'}
-                     onClick={() => {handleShowHideCartArea(true); setShowNotificationArea(false)}}>
+                     onClick={() => {
+                         handleShowHideCartArea(true);
+                         setShowNotificationArea(false)
+                     }}>
                     <button id={'btnCartProduct'} title={'ショッピングカート'}>
                         <FontAwesomeIcon icon={faShoppingCart}/>
                     </button>
@@ -94,7 +126,8 @@ const Navbar: React.FC<NavbarInterface> = ({cartResponse, handleShowHideCartArea
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item onClick={logout} eventKey="Option 1">ログアウト</Dropdown.Item>
-                        <Dropdown.Item hidden={!getUserToken().isUser} onClick={logout} eventKey="Option 2">Quản lý đơn hàng</Dropdown.Item>
+                        <Dropdown.Item hidden={!getUserToken().isUser} onClick={logout} eventKey="Option 2">Quản lý đơn
+                            hàng</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </div>

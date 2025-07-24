@@ -9,10 +9,11 @@ interface NotificationDetailInterface {
     totalNotification : number;
     notifications : Notification[];
     setShowNotificationArea : (value : boolean) => void;
+    type : string;
 }
-const NotificationDetail: React.FC<NotificationDetailInterface> = ({showNotificationArea, totalNotification, setShowNotificationArea, notifications}) => {
+const NotificationDetail: React.FC<NotificationDetailInterface> = ({type, showNotificationArea, totalNotification, setShowNotificationArea, notifications}) => {
   return (
-      <div hidden={!showNotificationArea} className={'notification-detail-area'}>
+      <div style={type === 'user' ? {top :'80px'} : {top : '60px'}} hidden={!showNotificationArea} className={'notification-detail-area'}>
           <div className="cart-detail-area-header">
               <div className="cart-detail-area-header-left">
                   <div className="cart-detail-area-header-left-title">

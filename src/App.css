@@ -61,7 +61,7 @@
     align-items: center;
 }
 
-.navbar-area-action button {
+.navbar-area-action button, .nav-staff-right button {
     border: none;
     outline: none;
     background-color: transparent;
@@ -145,7 +145,7 @@
     text-decoration: underline;
 }
 
-.nav-admin, .nav-staff, .nav-user {
+.nav-admin, .nav-user {
     height: 50px;
     background: white;
     padding: 10px 50px;
@@ -159,6 +159,25 @@
     width: 100%;
     z-index: 1000;
 }
+.nav-staff {
+    height: 60px;
+    background: #0272ba;
+    padding: 10px 50px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e5e5e5;
+    justify-content: space-between;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+.nav-staff-left, .nav-staff-right {
+    display: flex;
+    align-items: center;
+}
 
 .nav-admin-item, .nav-staff-item {
     margin-right: 20px;
@@ -166,7 +185,9 @@
     cursor: pointer;
 
 }
-
+.nav-staff-item {
+    color: white;
+}
 .nav-admin-item:hover, .nav-staff-item:hover {
     cursor: pointer;
 }
@@ -186,7 +207,9 @@
     height: 81.5vh;
     margin-top: 130px;
 }
-
+.staff-home-content {
+    margin-top: 60px;
+}
 .admin-home-left, .admin-home-right, .staff-home-left, .staff-home-right {
     width: 5%;
 }
@@ -1052,5 +1075,5 @@ textarea {
     padding: 10px;
     font-size: 14px;
     outline: none;
-    width: 200px;
+    width: 52%;
 }

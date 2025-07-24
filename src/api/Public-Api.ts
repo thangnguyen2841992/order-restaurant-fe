@@ -1,5 +1,6 @@
 import {jwtDecode} from "jwt-decode";
 import UserToken from "../model/UserToken";
+import {useNavigate} from "react-router-dom";
 
 export function getUserToken(): UserToken {
     const token = localStorage.getItem('token');
@@ -71,3 +72,4 @@ export const isTokenExpired = () => {
     if (!expiration) return true; // Nếu không tìm thấy, coi như hết hạn
     return Date.now() > parseInt(expiration);
 };
+

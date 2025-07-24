@@ -35,6 +35,7 @@ function UserHome() {
     const [showCartScreen, setShowCartScreen] = useState(false);
     const [showOrderScreen, setShowOrderScreen] = useState(false);
     const [reloadPage, setReloadPage] = useState(false);
+    const [type, setType] = useState('');
     const navigate = useNavigate();
 
 
@@ -209,7 +210,7 @@ function UserHome() {
 
     return (
         <div className={'user-home-area'}>
-            <Navbar setShowNotificationArea={setShowNotificationArea} notifications={notifications} totalNotification={totalNotification} setReloadPage={setReloadPage} setShowOrderScreen={setShowOrderScreen} cartResponse={cartResults}
+            <Navbar setType={setType} setShowNotificationArea={setShowNotificationArea} notifications={notifications} totalNotification={totalNotification} setReloadPage={setReloadPage} setShowOrderScreen={setShowOrderScreen} cartResponse={cartResults}
                     handleShowHideCartArea={setShowCartArea} setShowCartScreen={setShowCartScreen}/>
             <div onClick={() => {setShowCartArea(false); setShowNotificationArea(false)}} className="user-home-content">
                 <NavUser handleChangeMenuUser={handleChangeMenuUser}
@@ -412,7 +413,7 @@ function UserHome() {
                         )
                 }
             </div>
-            <NotificationDetail notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
+            <NotificationDetail type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
             <div className="cart-detail-area" hidden={!showCartArea}>
                 <div className="cart-detail-area-header">
                     <div className="cart-detail-area-header-left">

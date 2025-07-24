@@ -1,6 +1,5 @@
 import React, {ChangeEvent, useEffect, useRef, useState} from "react";
 import NavStaff from "./NavStaff";
-import Navbar from "../shared/Navbar";
 import Product from "../../model/Product";
 import {getAllNotificationsOfStaff, getAllProducts, getAllProductsOfBrand} from "../../api/Staff-Api";
 import ImageProduct from "./ImageProduct";
@@ -42,6 +41,7 @@ function StaffHome() {
     const [typeUpload, setTypeUpload] = useState<string>('create');
     const [showNotificationArea, setShowNotificationArea] = useState(false);
     const [client, setClient] = useState<Client>();
+    const [typeNotification, setTypeNotification] = useState('');
 
 
     const handleUploadExcel = () => {
@@ -264,7 +264,6 @@ function StaffHome() {
         event.target.value = '';
     };
 
-
     useEffect(() => {
         getAllNotificationsOfStaff().then((data) => {
             setNotifications(data);
@@ -289,13 +288,10 @@ function StaffHome() {
     }, [brandId, actionModalCreateUpdate])
     return (
         <div className={'staff-home-area'}>
-            <Navbar setShowNotificationArea={setShowNotificationArea} totalNotification={totalNotification} notifications={notifications} setShowOrderScreen={() => {
-            }} setReloadPage={() => {
-            }} cartResponse={cartResponse} handleShowHideCartArea={setTest} setShowCartScreen={setTest}/>
-            <div onClick={() => {setShowNotificationArea(false)}}>
-                <NavStaff handleChangeMenuStaff={handleChangeMenuStaff}
+            <div>
+                <NavStaff setType={setTypeNotification} totalNotification={totalNotification} handleChangeMenuStaff={handleChangeMenuStaff}
                           handleChangeBrandIdSelect={handleChangeBrandIdSelect}
-                          setShowOrderList={setShowOrderList}  />
+                          setShowOrderList={setShowOrderList} setShowNotificationArea={setShowNotificationArea}  />
             </div>
             <div onClick={() => {setShowNotificationArea(false)}} className="staff-home-content">
                 <div className="staff-home-left"></div>
@@ -468,7 +464,7 @@ function StaffHome() {
                 </div>
                 <div className="staff-home-right"></div>
             </div>
-            <NotificationDetail notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
+            <NotificationDetail type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
 
             <ModalCreateNewProduct
                 show={showModalCreatePopup}

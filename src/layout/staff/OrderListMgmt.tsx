@@ -4,6 +4,9 @@ import {getAllOrder} from "../../api/Order-Api";
 import {formatDateTime} from "../../api/Public-Api";
 import ModalOrderProductDetail from "./ModalOrderProductDetail";
 import ProductOrder from "../../model/ProductOrder";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faArrowDown, faArrowUp, faSearch} from "@fortawesome/free-solid-svg-icons";
+import NotificationDetail from "../user/NotificationDetail";
 
 interface OrderListMgmtInterface {
 }
@@ -16,6 +19,24 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
     const [reloadOrder, setReloadOrder] = React.useState(false);
     const [openHeight, setOpenHeight] = React.useState(false);
     const token = localStorage.getItem('token');
+
+    const [orderIdSearch, setOrderIdSearch] = useState('');
+    const orderIdSearchChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+        if (/^\d*$/.test(e.target.value)) {
+            setOrderIdSearch(e.target.value);
+        }
+    }
+
+    const [userSearch, setUserSearch] = useState('');
+    const userSearchChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+        setUserSearch(e.target.value);
+    }
+    const [userPhoneSearch, setUserPhoneSearch] = useState('');
+    const userPhoneSearchChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+        if (/^\d*$/.test(e.target.value)) {
+            setUserPhoneSearch(e.target.value);
+        }
+    }
 
     const processOrder = async (orderId : number, type : string) => {
         try {
@@ -62,16 +83,44 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
     return (
         <div className={'order-list-mgmt'}>
             <div className="staff-home-middle-header">
-                <div style={openHeight ? {height : '140px'} : {height : '70px'}} className={'staff-home-middle-header-filter'}>
+                <div style={openHeight ? {height : '130px'} : {height : '70px'}} className={'staff-home-middle-header-filter'}>
                     <div className="staff-home-middle-header-filter-top">
                         <div className="staff-home-middle-header-filter-user">
+                            <label >Mã đơn hàng</label>
+                            <input value={orderIdSearch} onChange={orderIdSearchChange} type="text" placeholder={'Mã đơn hàng'}/>
+                        </div>
+                        <div className="staff-home-middle-header-filter-user">
                             <label >Người đặt hàng</label>
-                            <input type="text" placeholder={'Người đặt hàng'}/>
+                            <input value={userSearch} onChange={userSearchChange} type="text" placeholder={'Người đặt hàng'}/>
                         </div>
                         <div className="staff-home-middle-header-filter-user">
                             <label >Số điện thoại </label>
-                            <input type="text" placeholder={'Số điện thoại'}/>
+                            <input value={userPhoneSearch} onChange={userPhoneSearchChange} type="text" placeholder={'Số điện thoại'}/>
                         </div>
+
+
+                        <div className="staff-home-middle-header-filter-user">
+                            <label >Giá trị</label>
+                            <select name="price">
+                                <option  value="0">Tất cả</option>
+                                <option value="1">Từ cao đến thấp</option>
+                                <option value="2">Từ thấp đến cao</option>
+                            </select>
+                        </div>
+                        <div className="staff-home-middle-header-filter-user">
+                            <label >Tiến độ</label>
+                            <select name="process">
+                                <option  value="0">Tất cả</option>
+                                <option value="1">Đang chờ</option>
+                                <option value="2">Đang xử lý</option>
+                                <option value="3">Hoàn thành</option>
+                            </select>
+                        </div>
+                        <button type={"button"} title={'Tìm kiếm'} style={{marginRight : '10px'}} className={'btn btn-primary'}><FontAwesomeIcon icon={faSearch}/></button>
+                        <button type={"button"} title={'Mở rộng'} hidden={openHeight} onClick={() => {setOpenHeight(true)}}  className={'btn btn-success'}><FontAwesomeIcon icon={faArrowDown}/></button>
+                        <button type={"button"} title={'Thu gọn'} hidden={!openHeight} onClick={() => {setOpenHeight(false)}}  className={'btn btn-success'}><FontAwesomeIcon icon={faArrowUp}/></button>
+                    </div>
+                    <div hidden={!openHeight} className="staff-home-middle-header-filter-bottom">
                         <div className="staff-home-middle-header-filter-user">
                             <label >Vận chuyển</label>
                             <select name="delivery">
@@ -89,18 +138,6 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                             </select>
                         </div>
                         <div className="staff-home-middle-header-filter-user">
-                            <label >Giá trị</label>
-                            <select name="price">
-                                <option  value="0">Tất cả</option>
-                                <option value="1">Từ cao đến thấp</option>
-                                <option value="2">Từ thấp đến cao</option>
-                            </select>
-                        </div>
-                        <button hidden={openHeight} onClick={() => {setOpenHeight(true)}} style={{marginLeft : '20px'}} className={'btn btn-success'}>Mở rộng</button>
-                        <button hidden={!openHeight} onClick={() => {setOpenHeight(false)}} style={{marginLeft : '20px'}} className={'btn btn-success'}>Thu gọn</button>
-                    </div>
-                    <div hidden={!openHeight} className="staff-home-middle-header-filter-bottom">
-                        <div className="staff-home-middle-header-filter-user">
                             <label>Thanh toán</label>
                             <select name="paymented">
                                 <option  value="0">Tất cả</option>
@@ -108,15 +145,7 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                                 <option value="2">Chưa thanh toán</option>
                             </select>
                         </div>
-                        <div className="staff-home-middle-header-filter-user">
-                            <label>Thanh toán</label>
-                            <select name="process">
-                                <option  value="0">Tất cả</option>
-                                <option value="1">Đang chờ</option>
-                                <option value="2">Đang xử lý</option>
-                                <option value="3">Hoàn thành</option>
-                            </select>
-                        </div>
+
                     </div>
 
 
