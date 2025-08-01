@@ -9,6 +9,7 @@ import AdminHome from "./layout/admin/AdminHome";
 import StaffHome from "./layout/staff/StaffHome";
 import UserHome from "./layout/user/UserHome";
 import FindPassword from "./layout/auth/FindPassword";
+import UserOrderList from "./layout/user/UserOrderList";
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
                   <Route path = "/admin/home" element={<AdminHome/>}></Route>
                   <Route path = "/staff/home" element={<StaffHome/>}></Route>
                   <Route path = "/user/home" element={<UserHome/>}></Route>
+                  <Route path = "/user/order" element={<UserOrderList/>}></Route>
                   <Route path = "/" element={<Login/>}></Route>
               </Routes>
           </BrowserRouter>

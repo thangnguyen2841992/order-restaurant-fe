@@ -40,6 +40,9 @@ const Navbar: React.FC<NavbarInterface> = ({
         localStorage.removeItem('expirationTime');
         navigate('/login');
     }
+    const showUserOrderList = () => {
+        navigate('/user/order');
+    }
 
     const backHomePage = () => {
         if (userToken.isUser) {
@@ -126,7 +129,7 @@ const Navbar: React.FC<NavbarInterface> = ({
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         <Dropdown.Item onClick={logout} eventKey="Option 1">ログアウト</Dropdown.Item>
-                        <Dropdown.Item hidden={!getUserToken().isUser} onClick={logout} eventKey="Option 2">Quản lý đơn
+                        <Dropdown.Item hidden={!getUserToken().isUser} onClick={showUserOrderList} eventKey="Option 2">Quản lý đơn
                             hàng</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>

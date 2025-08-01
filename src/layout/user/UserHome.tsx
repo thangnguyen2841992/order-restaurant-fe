@@ -10,7 +10,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHeart, faShoppingCart, faTimes} from "@fortawesome/free-solid-svg-icons";
 import {Client} from "@stomp/stompjs";
 import SockJS from 'sockjs-client';
-import {formatDateTime, getUserToken} from "../../api/Public-Api";
+import {getUserToken} from "../../api/Public-Api";
 import CartResponse from "../../model/CartResponse";
 import {getCartResponseOfUserId} from "../../api/Cart-Api";
 import CartDetailItem from "./CartDetailItem";
@@ -80,28 +80,36 @@ function UserHome() {
                 stompClient.subscribe('/topic/cart', (message) => {
                     const cart = JSON.parse(message.body);
                     console.log(cart);
-                    const cartResponse: CartResponse = {
-                        cartId: cart.cartId,
-                        dateCreated: cart.dateCreated,
-                        productCartList: cart.productCartList,
-                        userId: cart.userId,
-                        totalPrice: cart.totalPrice,
-                        totalProduct: cart.totalProduct
+                    if (cart.userId === getUserToken().userId) {
+                        const cartResponse: CartResponse = {
+                            cartId: cart.cartId,
+                            dateCreated: cart.dateCreated,
+                            productCartList: cart.productCartList,
+                            userId: cart.userId,
+                            totalPrice: cart.totalPrice,
+                            totalProduct: cart.totalProduct
+                        }
+                        setCartResults(cartResponse);
                     }
-                    setCartResults(cartResponse);
                 });
                 stompClient.subscribe('/topic/messageResponse', (message) => {
                     const response = JSON.parse(message.body);
                     console.log(response);
-                    alert(response.message);
+                    if (response.toUserId === getUserToken().userId) {
+                        alert(response.message);
+                    }
                 });
                 stompClient.subscribe('/topic/order', (message) => {
                     const response = JSON.parse(message.body);
-                    setShowCartScreen(false);
-                    setShowNotificationArea(false);
-                    setShowOrderScreen(false);
-                    setReloadPage(true);
-                    alert(response.message);
+                    if (response.toUserId === getUserToken().userId) {
+                        if (!response.error) {
+                            setShowCartScreen(false);
+                            setShowNotificationArea(false);
+                            setShowOrderScreen(false);
+                            setReloadPage(true);
+                        }
+                        alert(response.message);
+                    }
                 });
 
                 stompClient.subscribe('/topic/userNotification', (message) => {

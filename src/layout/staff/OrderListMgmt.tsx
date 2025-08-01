@@ -77,7 +77,7 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
 
     const handleSearchOrderListMgmt = () => {
         if (orderIdSearch !== '' || userSearch !== '' || userPhoneSearch !== '' || priceSearch != 0
-         || processSearch != 0 || deliverySearch != 0 || paymentSearch != 0 || paymentedSearch != 0) {
+            || processSearch != 0 || deliverySearch != 0 || paymentSearch != 0 || paymentedSearch != 0) {
             setIsSearched(true);
             const orderList = orders.filter((order) => {
                 const matchesOrderId = orderIdSearch === '' || order.orderId === Number(orderIdSearch);
@@ -101,7 +101,7 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                 const matchesPaymentedSearch =
                     (paymentedSearch === 1 && order.isPaymented) ||
                     (paymentedSearch === 2 && !order.isPaymented) ||
-                     paymentedSearch === 0;
+                    paymentedSearch === 0;
 
                 return matchesOrderId && matchesUserName && matchesUserPhone && matchesProcessSearch && matchesDeliverySearch && matchesPaymentSearch && matchesPaymentedSearch;
             })
@@ -114,7 +114,7 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
             }
             console.log(orderList);
             setOrdersSearch(orderList);
-        } else  {
+        } else {
             setIsSearched(false);
             setOrdersSearch([]);
         }
@@ -157,6 +157,12 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
     useEffect(() => {
         getAllOrder().then((data) => {
             setOrders(data);
+            setTimeout(function () {
+                if (isSearched) {
+                    handleSearchOrderListMgmt();
+                }
+            }, 500)
+
         }).catch((error) => {
             console.log(error);
         })
@@ -184,12 +190,10 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                             <input value={userPhoneSearch} onChange={userPhoneSearchChange} type="text"
                                    placeholder={'Số điện thoại'}/>
                         </div>
-
-
                         <div className="staff-home-middle-header-filter-user">
                             <label>Giá trị</label>
-                            <select value={priceSearch}  onChange={priceSearchChange} name="price">
-                                <option  value="0">Tất cả</option>
+                            <select value={priceSearch} onChange={priceSearchChange} name="price">
+                                <option value="0">Tất cả</option>
                                 <option value="1">Từ cao đến thấp</option>
                                 <option value="2">Từ thấp đến cao</option>
                             </select>
@@ -203,14 +207,16 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                                 <option value="3">Hoàn thành</option>
                             </select>
                         </div>
-                        <button onClick={handleResetSearchOrderListMgmt} type={"button"} title={'Reset'} style={{marginRight: '10px'}}
+                        <button onClick={handleResetSearchOrderListMgmt} type={"button"} title={'Reset'}
+                                style={{marginRight: '10px'}}
                                 className={'btn btn-primary'}><FontAwesomeIcon icon={faSync}/></button>
-                        <button onClick={handleSearchOrderListMgmt} type={"button"} title={'Tìm kiếm'} style={{marginRight: '10px'}}
+                        <button onClick={handleSearchOrderListMgmt} type={"button"} title={'Tìm kiếm'}
+                                style={{marginRight: '10px'}}
                                 className={'btn btn-primary'}><FontAwesomeIcon icon={faSearch}/></button>
                         <button type={"button"} title={'Mở rộng'} hidden={openHeight} onClick={() => {
                             setOpenHeight(true)
                         }} className={'btn btn-success'}><FontAwesomeIcon icon={faArrowDown}/></button>
-                        <button  type={"button"} title={'Thu gọn'} hidden={!openHeight} onClick={() => {
+                        <button type={"button"} title={'Thu gọn'} hidden={!openHeight} onClick={() => {
                             setOpenHeight(false)
                         }} className={'btn btn-success'}><FontAwesomeIcon icon={faArrowUp}/></button>
                     </div>
@@ -241,9 +247,15 @@ const OrderListMgmt: React.FC<OrderListMgmtInterface> = ({}) => {
                         </div>
                     </div>
                 </div>
-                {/*<div className={'staff-home-middle-header-btn'}>*/}
-                {/*    <button onClick={() => {setReloadOrder(true)}} className={'btn btn-primary'}>Làm mới trang web</button>*/}
-                {/*</div>*/}
+
+            </div>
+            <div className="orderList-content-header">
+                <div className="orderList-content-header-total">
+                    {(ordersSearch.length > 0 && isSearched) ? ordersSearch.length : orders.length} sản phẩm
+                </div>
+                <div className={'staff-home-middle-header-btn'}>
+                    <button onClick={() => {setReloadOrder(true); setIsSearched(false);}} className={'btn btn-primary'}>Làm mới trang web</button>
+                </div>
             </div>
             <table className="table table-bordered">
                 <thead>

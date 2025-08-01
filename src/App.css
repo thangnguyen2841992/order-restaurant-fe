@@ -1077,3 +1077,40 @@ textarea {
     outline: none;
     width: 52%;
 }
+.orderList-content-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.orderList-content-header-total {
+    background-color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.user-order-list-area {
+    height: 100vh;
+    padding: 0 5%;
+}
+.user-product-item {
+    background-color: #f2f2f2;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+.user-product-item {
+    display: flex; align-items: center;
+}
+.user-product-item-index {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+.user-product-item-quantity, .user-product-item-total {
+    color: black;
+    margin-right: 10px;
+}

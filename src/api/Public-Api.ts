@@ -1,6 +1,5 @@
 import {jwtDecode} from "jwt-decode";
 import UserToken from "../model/UserToken";
-import {useNavigate} from "react-router-dom";
 
 export function getUserToken(): UserToken {
     const token = localStorage.getItem('token');
@@ -50,7 +49,7 @@ export function formatDate(date: string) {
     return date1.toLocaleDateString('vi-VN');
 }
 
-export const formatDateTime = (date:string) => {
+export const     formatDateTime = (date:string) => {
     let date1 : Date;
     if (date === '') {
         date1 = new Date()

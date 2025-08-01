@@ -74,6 +74,7 @@ export async function getAllNotificationsOfStaff(): Promise<Notification[]> {
                 orderId: responseData[key].orderId,
                 message: responseData[key].message,
                 isStaff: responseData[key].staff,
+                dateCreated: responseData[key].dateCreated
             }
         );
     }
