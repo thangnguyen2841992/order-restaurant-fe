@@ -19,18 +19,21 @@ import {useNavigate} from "react-router-dom";
 import Order from "./Order";
 import Notification from "../../model/Notification";
 import NotificationDetail from "./NotificationDetail";
+import ChatComponent from "./ChatComponent";
 
 
 function UserHome() {
     const [menuStaff, setMenuStaff] = useState<string>('listProduct');
     const [brandId, setBrandId] = useState(0);
     const [totalNotification, setTotalNotification] = useState(0);
+    const [chatId, setChatId] = useState(0);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [brandName, setBrandName] = useState('新鮮な食べ物');
     const [products, setProducts] = useState<Product[]>([]);
     const [cartResults, setCartResults] = useState<CartResponse>({});
     const userTokenId = getUserToken().userId;
     const [showCartArea, setShowCartArea] = useState(false);
+    const [showChat, setShowChat] = useState(false);
     const [showNotificationArea, setShowNotificationArea] = useState(false);
     const [showCartScreen, setShowCartScreen] = useState(false);
     const [showOrderScreen, setShowOrderScreen] = useState(false);
@@ -421,7 +424,7 @@ function UserHome() {
                         )
                 }
             </div>
-            <NotificationDetail type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
+            <NotificationDetail client={client ? client : new Client()} setShowChatArea={setShowChat} type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
             <div className="cart-detail-area" hidden={!showCartArea}>
                 <div className="cart-detail-area-header">
                     <div className="cart-detail-area-header-left">
@@ -485,6 +488,7 @@ function UserHome() {
                         className={'btn btn-primary'}>Xem giỏ hàng
                 </button>
             </div>
+            <ChatComponent reloadChat={false} chatId={chatId} client={client ? client : new Client()} showChat={showChat} setShowChat={setShowChat}/>
         </div>
     )
 }

@@ -15,11 +15,13 @@ import {Client} from "@stomp/stompjs";
 import {getUserToken} from "../../api/Public-Api";
 import SockJS from "sockjs-client";
 import NotificationDetail from "../user/NotificationDetail";
+import ChatComponent from "../user/ChatComponent";
 
 
 
 function StaffHome() {
     const [totalNotification, setTotalNotification] = useState(0);
+    const [chatId, setChatId] = useState(0);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [actionModalCreateUpdate, setActionModalCreateUpdate] = useState(false);
     const [showEditImageForm, setShowEditImageForm] = useState(false);
@@ -42,6 +44,8 @@ function StaffHome() {
     const [showNotificationArea, setShowNotificationArea] = useState(false);
     const [client, setClient] = useState<Client>();
     const [typeNotification, setTypeNotification] = useState('');
+    const [showChat, setShowChat] = useState(false);
+    const [reloadChat, setReloadChat] = useState(false);
 
 
     const handleUploadExcel = () => {
@@ -117,7 +121,6 @@ function StaffHome() {
             },
             onConnect: () => {
 
-
                 stompClient.subscribe('/topic/staffNotification', (message) => {
                     const response = JSON.parse(message.body);
                     console.log(response);
@@ -136,6 +139,12 @@ function StaffHome() {
                             return updatedNotifications;
                         });
                     }
+                });
+                stompClient.subscribe('/topic/approvalChat', (message) => {
+                    const response = JSON.parse(message.body);
+                    setChatId(response.processId);
+                    setShowChat(true);
+                    console.log(response);
                 });
             },
             webSocketFactory: () => {
@@ -464,7 +473,7 @@ function StaffHome() {
                 </div>
                 <div className="staff-home-right"></div>
             </div>
-            <NotificationDetail type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
+            <NotificationDetail client={client ? client : new Client()} setShowChatArea={setShowChat} type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
 
             <ModalCreateNewProduct
                 show={showModalCreatePopup}
@@ -485,6 +494,7 @@ function StaffHome() {
                 type={typeUpload}
                 setActionModalCreateUpdate={setActionModalCreateUpdate}
             />
+            <ChatComponent reloadChat={reloadChat} chatId={chatId} client={client ? client : new Client()} showChat={showChat} setShowChat={setShowChat}/>
         </div>
     )
 }

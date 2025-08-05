@@ -72,6 +72,7 @@ export async function getAllNotificationsOfStaff(): Promise<Notification[]> {
                 notificationId: responseData[key].notificationId,
                 toUserId: responseData[key].toUserId,
                 orderId: responseData[key].orderId,
+                chatId: responseData[key].chatId,
                 message: responseData[key].message,
                 isStaff: responseData[key].staff,
                 dateCreated: responseData[key].dateCreated
