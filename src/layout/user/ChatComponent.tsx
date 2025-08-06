@@ -16,12 +16,6 @@ interface ChatComponentInterface {
 
 const ChatComponent: React.FC<ChatComponentInterface> = ({client, showChat, setShowChat, reloadChat, chatId}) => {
     const [chats, setChats] = useState<Chat[]>([]);
-    useEffect(() => {
-        getAllChatOfUser(chatId).then((data) => {
-            setChats(data);
-        })
-    }, [reloadChat]);
-
     const [content, setContent] = useState('');
     const handleChangeContent = (e : ChangeEvent<HTMLInputElement>) => {
         setContent(e.target.value);
@@ -31,7 +25,6 @@ const ChatComponent: React.FC<ChatComponentInterface> = ({client, showChat, setS
             if (client) {
                 let chatSend = JSON.stringify({
                     formUserId: getUserToken().userId,
-                    staffId: 0,
                     content : content
                 })
                 client.publish({

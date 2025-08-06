@@ -16,6 +16,7 @@ import {getUserToken} from "../../api/Public-Api";
 import SockJS from "sockjs-client";
 import NotificationDetail from "../user/NotificationDetail";
 import ChatComponent from "../user/ChatComponent";
+import ChatStaff from "./ChatStaff";
 
 
 
@@ -298,7 +299,7 @@ function StaffHome() {
     return (
         <div className={'staff-home-area'}>
             <div>
-                <NavStaff setType={setTypeNotification} totalNotification={totalNotification} handleChangeMenuStaff={handleChangeMenuStaff}
+                <NavStaff setReloadChat={setReloadChat} showNotificationArea={showNotificationArea} setType={setTypeNotification} totalNotification={totalNotification} handleChangeMenuStaff={handleChangeMenuStaff}
                           handleChangeBrandIdSelect={handleChangeBrandIdSelect}
                           setShowOrderList={setShowOrderList} setShowNotificationArea={setShowNotificationArea}  />
             </div>
@@ -473,7 +474,7 @@ function StaffHome() {
                 </div>
                 <div className="staff-home-right"></div>
             </div>
-            <NotificationDetail client={client ? client : new Client()} setShowChatArea={setShowChat} type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
+            <NotificationDetail setReloadChat={setReloadChat}  client={client ? client : new Client()} setShowChatArea={setShowChat} type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
 
             <ModalCreateNewProduct
                 show={showModalCreatePopup}
@@ -494,7 +495,7 @@ function StaffHome() {
                 type={typeUpload}
                 setActionModalCreateUpdate={setActionModalCreateUpdate}
             />
-            <ChatComponent reloadChat={reloadChat} chatId={chatId} client={client ? client : new Client()} showChat={showChat} setShowChat={setShowChat}/>
+            <ChatStaff reloadChat={reloadChat} showChatStaff={showChat} setShowChatStaff={setShowChat}/>
         </div>
     )
 }

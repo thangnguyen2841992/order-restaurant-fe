@@ -14,7 +14,9 @@ interface NavStaffInterface {
     setShowOrderList: (value: boolean) => void
     setType: (value: string) => void
     setShowNotificationArea: (value: boolean) => void;
+    showNotificationArea: boolean;
     totalNotification: number;
+    setReloadChat: (value: boolean) => void;
 }
 
 const NavStaff: React.FC<NavStaffInterface> = ({
@@ -23,7 +25,9 @@ const NavStaff: React.FC<NavStaffInterface> = ({
                                                    handleChangeMenuStaff,
                                                    handleChangeBrandIdSelect,
                                                    setShowOrderList,
-                                                   setShowNotificationArea
+                                                   setShowNotificationArea,
+                                                   showNotificationArea,
+                                                   setReloadChat
                                                }) => {
     const navigate = useNavigate();
     const [brands, setBrands] = useState<Brand[]>([]);
@@ -88,8 +92,10 @@ const NavStaff: React.FC<NavStaffInterface> = ({
             </div>
             <div className="nav-staff-right">
                 <div className={'notification-area'}>
-                    <button onClick={() =>
-                    {setShowNotificationArea(true); setType('staff')}
+                    <button onClick={() => {
+                        setShowNotificationArea(!showNotificationArea);
+                        setType('staff')
+                    }
                     } id={'btnNotification'} title={'Notification'}>
                         <FontAwesomeIcon icon={faBell}/>
                     </button>

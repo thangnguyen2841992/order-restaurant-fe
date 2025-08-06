@@ -40,6 +40,8 @@ function UserHome() {
     const [reloadPage, setReloadPage] = useState(false);
     const [type, setType] = useState('');
     const navigate = useNavigate();
+    const [reloadChat, setReloadChat] = useState(false);
+
 
 
     const handleChangeMenuUser = (value: string) => {
@@ -424,7 +426,7 @@ function UserHome() {
                         )
                 }
             </div>
-            <NotificationDetail client={client ? client : new Client()} setShowChatArea={setShowChat} type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
+            <NotificationDetail setReloadChat={setReloadChat} client={client ? client : new Client()} setShowChatArea={setShowChat} type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
             <div className="cart-detail-area" hidden={!showCartArea}>
                 <div className="cart-detail-area-header">
                     <div className="cart-detail-area-header-left">

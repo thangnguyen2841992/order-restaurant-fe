@@ -1,6 +1,7 @@
 import {myRequestToken} from "./Public-Api";
 import Product from "../model/Product";
 import Notification from "../model/Notification";
+import WaitingChatResponse from "../model/WaitingChatResponse";
 
 export async function getAllProducts(): Promise<Product[]> {
     let url: string = `http://localhost:8083/staff-api/getAllProducts`;
@@ -75,6 +76,7 @@ export async function getAllNotificationsOfStaff(): Promise<Notification[]> {
                 chatId: responseData[key].chatId,
                 message: responseData[key].message,
                 isStaff: responseData[key].staff,
+                isChat: responseData[key].chat,
                 dateCreated: responseData[key].dateCreated
             }
         );
@@ -102,6 +104,31 @@ export async function getProductByProductId(productId: number): Promise<Product>
         isDelete: responseData.delete
 
     };
+}
+
+export async function findWaitingChatByDeleted(): Promise<WaitingChatResponse[]> {
+    let url: string = `http://localhost:8083/staff-api/findWaitingChatByDeleted`;
+
+    const responseData = await myRequestToken(url);
+
+    let waitingChats: WaitingChatResponse[] = [];
+
+    for (const key in responseData) {
+        waitingChats.push(
+            {
+                messageId: responseData[key].messageId,
+                userId: responseData[key].userId,
+                staffAssignId: responseData[key].staffAssignId,
+                content: responseData[key].content,
+                userName: responseData[key].userName,
+                staffAssignName: responseData[key].staffAssignName,
+                deleted: responseData[key].deleted,
+                dateCreated: responseData[key].dateCreated
+            }
+        );
+    }
+
+    return waitingChats;
 }
 
 

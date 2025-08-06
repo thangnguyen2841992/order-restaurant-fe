@@ -13,7 +13,8 @@ interface NotificationDetailInterface {
     setShowNotificationArea: (value: boolean) => void;
     setShowChatArea: (value: boolean) => void;
     type: string;
-    client: Client
+    client: Client;
+    setReloadChat: (value: boolean) => void;
 }
 
 const NotificationDetail: React.FC<NotificationDetailInterface> = ({
@@ -23,20 +24,14 @@ const NotificationDetail: React.FC<NotificationDetailInterface> = ({
                                                                        setShowNotificationArea,
                                                                        notifications,
                                                                        setShowChatArea,
-                                                                       client
+                                                                       client,
+                                                                       setReloadChat
                                                                    }) => {
 
-    const handleApproChat = (chatId : number) => {
-        if (client) {
-            let chatSend = JSON.stringify({
-                chatId: chatId,
-                userId: getUserToken().userId
-            })
-            client.publish({
-                destination: '/app/approval-chat',
-                body: chatSend
-            });
-        }
+    const handleApproChat = () => {
+        setShowChatArea(true);
+        setReloadChat(true);
+        setShowNotificationArea(false);
     }
     return (
         <div style={type === 'user' ? {top: '80px'} : {top: '60px'}} hidden={!showNotificationArea}
@@ -69,9 +64,9 @@ const NotificationDetail: React.FC<NotificationDetailInterface> = ({
                                         {notification.message}
                                     </div>
                                     <div className="notification-detail-area-content-item-top-action" onClick={() => {
-                                        handleApproChat(notification.chatId ? notification.chatId : 0);
+                                        handleApproChat();
                                     }}>
-                                        {notification.chatId && notification.chatId > 0 ? 'Bạn hãy trả lời khách hàng.' : 'Bạn hãy kiểm tra đơn hàng.'}
+                                        {notification.isChat  ? 'Bạn hãy trả lời khách hàng.' : 'Bạn hãy kiểm tra đơn hàng.'}
                                     </div>
                                 </div>
                                 <div className="notification-detail-area-content-item-bottom">
