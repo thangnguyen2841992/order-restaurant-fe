@@ -1132,7 +1132,7 @@ textarea {
     right: 30px;
     bottom: 20px;
     width: 250px;
-    height: 350px;
+    height: 380px;
     border: 1px solid #007bff;
     border-radius: 5px;
     background-color: white;
@@ -1152,6 +1152,8 @@ textarea {
 }
 .chat-popup-content {
     padding: 10px;
+    overflow-y: auto;
+    height:250px;
 }
 .chat-popup-form {
     position: absolute;
@@ -1247,4 +1249,24 @@ textarea {
 }
 .chat-staff-list-waiting-chat-content {
     padding: 10px;
+}
+.list-chat-box-item {
+    display: flex;
+    justify-content: space-between; /* Căn chỉnh hai phần tử hai bên */
+    margin: 10px 0; /* Khoảng cách giữa các tin nhắn */
+}
+.list-chat-box-item-formUser
+{
+    width: 70%; /* Đặt chiều rộng cho cả hai phần tử */
+}
+.list-chat-box-item-toUser {
+    width: 80%;
+}
+
+.list-chat-box-item-formUser {
+    margin-left: auto; /* Đẩy phần tử này sang bên phải */
+}
+
+.list-chat-box-item-toUser {
+    margin-right: auto; /* Đẩy phần tử này sang bên trái */
 }

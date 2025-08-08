@@ -1,7 +1,8 @@
-import {myRequestToken} from "./Public-Api";
+import {getUserToken, myRequestToken} from "./Public-Api";
 import Product from "../model/Product";
 import Notification from "../model/Notification";
 import WaitingChatResponse from "../model/WaitingChatResponse";
+import ChatRoomResponse from "../model/ChatRoomResponse";
 
 export async function getAllProducts(): Promise<Product[]> {
     let url: string = `http://localhost:8083/staff-api/getAllProducts`;
@@ -129,6 +130,30 @@ export async function findWaitingChatByDeleted(): Promise<WaitingChatResponse[]>
     }
 
     return waitingChats;
+}
+
+export async function getAllChatRoomOfStaffId(): Promise<ChatRoomResponse[]> {
+    let url: string = `http://localhost:8083/staff-api/getAllChatRoomOfStaffId?staffId=${getUserToken().userId}`;
+
+    const responseData = await myRequestToken(url);
+
+    let chatResponses: ChatRoomResponse[] = [];
+
+    for (const key in responseData) {
+        chatResponses.push(
+            {
+                chatRoomId: responseData[key].chatRoomId,
+                formUserId: responseData[key].formUserId,
+                formUsername: responseData[key].formUsername,
+                staffId: responseData[key].staffId,
+                staffName: responseData[key].staffName,
+                dateCreated: responseData[key].dateCreated,
+                isClosed: responseData[key].isClosed
+            }
+        );
+    }
+
+    return chatResponses;
 }
 
 

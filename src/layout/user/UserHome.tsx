@@ -136,6 +136,13 @@ function UserHome() {
                         });
                     }
                 });
+                stompClient.subscribe('/topic/chat', (message) => {
+                    const response = JSON.parse(message.body);
+                    if (response.formUserId == getUserToken().userId || response.toUserId == getUserToken().userId) {
+                        setReloadChat(true);
+                        console.log('thang')
+                    }
+                });
             },
             webSocketFactory: () => {
                 return new SockJS('http://localhost:8083/ws');

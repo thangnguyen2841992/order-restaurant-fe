@@ -495,7 +495,7 @@ function StaffHome() {
                 type={typeUpload}
                 setActionModalCreateUpdate={setActionModalCreateUpdate}
             />
-            <ChatStaff reloadChat={reloadChat} showChatStaff={showChat} setShowChatStaff={setShowChat}/>
+            <ChatStaff client={client ? client : new Client()} reloadChat={reloadChat} showChatStaff={showChat} setShowChatStaff={setShowChat}/>
         </div>
     )
 }

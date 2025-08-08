@@ -1,26 +1,27 @@
-import CartResponse from "../model/CartResponse";
-import {getUserToken, myRequest, myRequestToken} from "./Public-Api";
-import Chat from "../model/Chat";
-import Image from "../model/Image";
+import ChatResponse from "../model/ChatResponse";
+import {getUserToken, myRequestToken} from "./Public-Api";
 
-export async function getAllChatOfUser(chatId: number): Promise<Chat[]> {
-    let url: string = `http://localhost:8083/chat/getAllChat?chatId=${chatId}`;
+export async function findAllChatOfUser(): Promise<ChatResponse[]> {
+    let url: string = `http://localhost:8083/all-api/findAllChatOfUser?userId=${getUserToken().userId}`;
 
+    const responseData = await myRequestToken(url);
 
-    const responseData = await myRequest(url);
-    let chats: Chat[] = [];
+    let chatResponses: ChatResponse[] = [];
 
     for (const key in responseData) {
-        chats.push(
+        chatResponses.push(
             {
-                chatId: responseData[key].chatId,
                 formUserId: responseData[key].formUserId,
-                staffId: responseData[key].staffId,
+                formUserName: responseData[key].formUserName,
+                toUserId: responseData[key].toUserId,
+                toUserName: responseData[key].toUserName,
+                chatRoomId: responseData[key].chatRoomId,
                 content: responseData[key].content,
-                dateCreated: responseData[key].dateCreated,
+                showPopup: responseData[key].showPopup,
+                dateCreated: responseData[key].dateCreated
             }
         );
     }
 
-    return chats;
+    return chatResponses;
 }
