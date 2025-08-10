@@ -4,41 +4,72 @@ import {faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import {Client} from "@stomp/stompjs";
 import {formatDate, formatDateTime, getUserToken} from "../../api/Public-Api";
 import ChatResponse from "../../model/ChatResponse";
-import {findAllChatOfUser} from "../../api/Chat-Api";
+import {findAllChatOfStaff, findAllChatOfUser} from "../../api/Chat-Api";
 
 interface ChatComponentInterface {
     client : Client;
     showChat :  boolean;
     setShowChat : (value : boolean) => void;
+    setReloadChat : (value : boolean) => void;
     reloadChat : boolean;
-    chatId : number;
+    chatRoomId : number;
+    isStaff : boolean
 }
 
-const ChatComponent: React.FC<ChatComponentInterface> = ({client, showChat, setShowChat, reloadChat, chatId}) => {
+const ChatComponent: React.FC<ChatComponentInterface> = ({client, showChat, setShowChat, reloadChat, chatRoomId, setReloadChat, isStaff}) => {
     const [chats, setChats] = useState<ChatResponse[]>([]);
     const [content, setContent] = useState('');
+    const [name, setName] = useState('');
+    const ITEMS_PER_PAGE = 10;
+    const [totalChat, setTotalChat] = useState(1);
     const handleChangeContent = (e : ChangeEvent<HTMLInputElement>) => {
         setContent(e.target.value);
     }
+    const displayedChats = chats.slice(
+         0, totalChat * ITEMS_PER_PAGE
+    );
     // Theo dõi sự thay đổi của value
     useEffect(() => {
         if (reloadChat) {
-            findAllChatOfUser().then((data) => {
-                setChats(data);
-            }).catch((error) => {
-                console.log(error)
-            });
+            if (!isStaff) {
+                findAllChatOfUser().then((data) => {
+                    setChats(data);
+                    setName(data[0].toUserName ? data[0].toUserName : "");
+                }).catch((error) => {
+                    console.log(error)
+                });
+            } else {
+                findAllChatOfStaff(chatRoomId).then((data) => {
+                    setChats(data);
+                    setName( data[0].formUserName ? "Khách hàng: " + data[0].formUserName : "");
+                }).catch((error) => {
+                    console.log(error)
+                });
+            }
+
         }
+        setReloadChat(false);
     }, [reloadChat]); // Chạy lại khi value thay đổi
 
 
      const showChatArea = () => {
          setShowChat(true);
-         findAllChatOfUser().then((data) => {
-             setChats(data);
-         }).catch((error) => {
-             console.log(error)
-         });
+             if (!isStaff) {
+                 findAllChatOfUser().then((data) => {
+                     setChats(data);
+                     setName( data[0].toUserName ? "Nhân viên: " + data[0].toUserName : "");
+                 }).catch((error) => {
+                     console.log(error)
+
+                 });
+             } else {
+                 findAllChatOfStaff(chatRoomId).then((data) => {
+                     setChats(data);
+                     setName( data[0].formUserName ? "Khách hàng: " + data[0].formUserName : "");
+                 }).catch((error) => {
+                     console.log(error)
+                 });
+             }
      }
 
     const handleChat = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -46,7 +77,9 @@ const ChatComponent: React.FC<ChatComponentInterface> = ({client, showChat, setS
             if (client) {
                 let chatSend = JSON.stringify({
                     formUserId: getUserToken().userId,
-                    content : content
+                    content : content,
+                    isStaff : isStaff ? "Y" : "N",
+                    chatRoomId : chatRoomId ? chatRoomId : 0,
                 })
                 client.publish({
                     destination: '/app/add-chat',
@@ -57,14 +90,14 @@ const ChatComponent: React.FC<ChatComponentInterface> = ({client, showChat, setS
         }
     }
     return (
-        <div className={'chat-area'}>
-            <div hidden={showChat} onClick={() => {showChatArea()}} title={'Bạn cần tư vấn gì? Hãy chia sẻ với chúng tôi'} className="chat-icon">
+        <div  className={'chat-area'}>
+            <div hidden={showChat || isStaff} onClick={() => {showChatArea()}} title={'Bạn cần tư vấn gì? Hãy chia sẻ với chúng tôi'} className="chat-icon">
                 <FontAwesomeIcon icon={faPaperPlane}/>
             </div>
-            <div hidden={!showChat} className="chat-popup-area">
+            <div style={isStaff ? {right : '650px'} : {right : '30px'}} hidden={!showChat} className="chat-popup-area">
                     <div className="chat-popup-header">
                         <div className="chat-popup-header-left">
-                            {chatId !== 0 ? chatId : 'Đang chờ...'}
+                            {name === '' ? 'Đang chờ...' : name}
                         </div>
                         <div onClick={()=> {setShowChat(false);}} title={'Đóng cửa sổ chat'} className="chat-popup-header-right">
                             <FontAwesomeIcon icon={faClose}/>
@@ -75,7 +108,7 @@ const ChatComponent: React.FC<ChatComponentInterface> = ({client, showChat, setS
                         Bạn cần tư vấn gì vậy? <br/> Chúng tôi sẽ phản hồi ngay.
                     </div>
                     {
-                        chats && chats.length > 0 && chats.map((chat, index) => (
+                        chats && chats.length > 0 && displayedChats.map((chat, index) => (
                             <div key={index} className={'list-chat-box-item'}>
                                 <div hidden={chat.formUserId !== getUserToken().userId}
                                      className="list-chat-box-item-formUser">
@@ -105,6 +138,9 @@ const ChatComponent: React.FC<ChatComponentInterface> = ({client, showChat, setS
                             </div>
                         ))
                     }
+                </div>
+                <div hidden={displayedChats.length === chats.length || chats.length <= 10} className={'more-display-chat'} onClick={() => setTotalChat(totalChat + 1)}>
+                    Hiển thị thêm tin nhắn
                 </div>
                 <div className="chat-popup-form">
                     <div className="chat-popup-form-left">

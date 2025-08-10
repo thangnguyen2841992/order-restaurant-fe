@@ -15,14 +15,12 @@ import {Client} from "@stomp/stompjs";
 import {getUserToken} from "../../api/Public-Api";
 import SockJS from "sockjs-client";
 import NotificationDetail from "../user/NotificationDetail";
-import ChatComponent from "../user/ChatComponent";
 import ChatStaff from "./ChatStaff";
-
 
 
 function StaffHome() {
     const [totalNotification, setTotalNotification] = useState(0);
-    const [chatId, setChatId] = useState(0);
+    const [chatRoomId, setChatRoomId] = useState(0);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [actionModalCreateUpdate, setActionModalCreateUpdate] = useState(false);
     const [showEditImageForm, setShowEditImageForm] = useState(false);
@@ -47,6 +45,11 @@ function StaffHome() {
     const [typeNotification, setTypeNotification] = useState('');
     const [showChat, setShowChat] = useState(false);
     const [reloadChat, setReloadChat] = useState(false);
+    const [reloadChatPopUp, setReloadChatPopUp] = useState(false);
+    const [reloadNotification, setReloadNotification] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const audioMessager = new Audio('/messager.mp3');
+    const [showChatPopUp, setShowChatPopUp] = useState(false);
 
 
     const handleUploadExcel = () => {
@@ -125,27 +128,38 @@ function StaffHome() {
                 stompClient.subscribe('/topic/staffNotification', (message) => {
                     const response = JSON.parse(message.body);
                     console.log(response);
-                    if (response.toUserId === getUserToken().userId) {
-                        const notification : Notification = {
-                            notificationId : response.notificationId,
-                            toUserId : response.toUserId,
-                            orderId : response.orderId,
-                            message : response.message,
-                            dateCreated : response.dateCreated,
-                            isStaff : response.staff
-                        }
-                        setNotifications(prevNotifications => {
-                            const updatedNotifications = [notification, ...prevNotifications];
-                            setTotalNotification(updatedNotifications.length);
-                            return updatedNotifications;
-                        });
+                    if (response.toUserId === getUserToken().userId || response.staff == true) {
+                        setReloadNotification(true);
                     }
                 });
-                stompClient.subscribe('/topic/approvalChat', (message) => {
+                stompClient.subscribe('/topic/waitingChat', (message) => {
+                    setReloadChat(true);
+                });
+                stompClient.subscribe('/topic/chat', (message) => {
                     const response = JSON.parse(message.body);
-                    setChatId(response.processId);
-                    setShowChat(true);
-                    console.log(response);
+                    console.log(response)
+                    if (response.formUserId == getUserToken().userId || response.toUserId == getUserToken().userId) {
+                        audioMessager.play().catch(error => {
+                            console.error('Error playing audio:', error);
+                        });
+                        setReloadChatPopUp(true);
+                        setReloadChat(true);
+                        setIsVisible(true);
+                        setShowChat(true);
+                        setShowChatPopUp(true);
+                        setChatRoomId(Number(response.chatRoomId));
+
+                        // Tắt nhấp nháy sau 1 giây
+                        setTimeout(() => {
+                            setIsVisible(false);
+                        }, 5000); // Thời gian hiển thị 1 giây
+                    }
+                });
+                stompClient.subscribe('/topic/closeChatRoom', (message) => {
+                    const response = JSON.parse(message.body);
+                    if (response.toUserId == getUserToken().userId) {
+                        setReloadChat(true);
+                    }
                 });
             },
             webSocketFactory: () => {
@@ -281,6 +295,10 @@ function StaffHome() {
         }).catch((error) => {
             console.log(error);
         })
+        setReloadNotification(false);
+    }, [reloadNotification]);
+
+    useEffect(() => {
         if (Number(brandId) !== 0) {
             getAllProductsOfBrand(brandId).then((data) => {
                 setProducts(data);
@@ -299,11 +317,15 @@ function StaffHome() {
     return (
         <div className={'staff-home-area'}>
             <div>
-                <NavStaff setReloadChat={setReloadChat} showNotificationArea={showNotificationArea} setType={setTypeNotification} totalNotification={totalNotification} handleChangeMenuStaff={handleChangeMenuStaff}
+                <NavStaff setReloadChat={setReloadChat} showNotificationArea={showNotificationArea}
+                          setType={setTypeNotification} totalNotification={totalNotification}
+                          handleChangeMenuStaff={handleChangeMenuStaff}
                           handleChangeBrandIdSelect={handleChangeBrandIdSelect}
-                          setShowOrderList={setShowOrderList} setShowNotificationArea={setShowNotificationArea}  />
+                          setShowOrderList={setShowOrderList} setShowNotificationArea={setShowNotificationArea}/>
             </div>
-            <div onClick={() => {setShowNotificationArea(false)}} className="staff-home-content">
+            <div onClick={() => {
+                setShowNotificationArea(false)
+            }} className="staff-home-content">
                 <div className="staff-home-left"></div>
                 <div className="staff-home-middle">
                     <div hidden={menuStaff !== 'listProduct' || showOrderList} className="staff-home-middle-list">
@@ -468,13 +490,16 @@ function StaffHome() {
 
                     </div>
                     <div hidden={!showOrderList}>
-                        <OrderListMgmt />
+                        <OrderListMgmt/>
                     </div>
 
                 </div>
                 <div className="staff-home-right"></div>
             </div>
-            <NotificationDetail setReloadChat={setReloadChat}  client={client ? client : new Client()} setShowChatArea={setShowChat} type={type} notifications={notifications} totalNotification={totalNotification} showNotificationArea={showNotificationArea} setShowNotificationArea={setShowNotificationArea}/>
+            <NotificationDetail setReloadChat={setReloadChat} client={client ? client : new Client()}
+                                setShowChatArea={setShowChat} type={type} notifications={notifications}
+                                totalNotification={totalNotification} showNotificationArea={showNotificationArea}
+                                setShowNotificationArea={setShowNotificationArea}/>
 
             <ModalCreateNewProduct
                 show={showModalCreatePopup}
@@ -495,7 +520,10 @@ function StaffHome() {
                 type={typeUpload}
                 setActionModalCreateUpdate={setActionModalCreateUpdate}
             />
-            <ChatStaff client={client ? client : new Client()} reloadChat={reloadChat} showChatStaff={showChat} setShowChatStaff={setShowChat}/>
+            <ChatStaff chatRoomId={chatRoomId} setChatRoomId={setChatRoomId} showChatPopUp={showChatPopUp} setShowChatPopUp={setShowChatPopUp} isVisible={isVisible}
+                       setReloadChat={setReloadChat} reloadChatRoom={reloadChatPopUp}
+                       setReloadChatRoom={setReloadChatPopUp} client={client ? client : new Client()}
+                       reloadChat={reloadChat} showChatStaff={showChat} setShowChatStaff={setShowChat}/>
         </div>
     )
 }

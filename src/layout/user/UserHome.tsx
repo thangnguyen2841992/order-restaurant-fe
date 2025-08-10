@@ -143,6 +143,12 @@ function UserHome() {
                         console.log('thang')
                     }
                 });
+                stompClient.subscribe('/topic/closeChatRoom', (message) => {
+                    const response = JSON.parse(message.body);
+                    if (response.formUserId == getUserToken().userId) {
+                        setReloadChat(true);
+                    }
+                });
             },
             webSocketFactory: () => {
                 return new SockJS('http://localhost:8083/ws');
@@ -497,7 +503,7 @@ function UserHome() {
                         className={'btn btn-primary'}>Xem giỏ hàng
                 </button>
             </div>
-            <ChatComponent reloadChat={false} chatId={chatId} client={client ? client : new Client()} showChat={showChat} setShowChat={setShowChat}/>
+            <ChatComponent isStaff={false} setReloadChat={setReloadChat} reloadChat={reloadChat} chatRoomId={chatId} client={client ? client : new Client()} showChat={showChat} setShowChat={setShowChat}/>
         </div>
     )
 }

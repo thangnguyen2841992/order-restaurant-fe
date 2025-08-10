@@ -25,7 +25,7 @@ const NotificationDetail: React.FC<NotificationDetailInterface> = ({
                                                                        notifications,
                                                                        setShowChatArea,
                                                                        client,
-                                                                       setReloadChat
+                                                                       setReloadChat,
                                                                    }) => {
 
     const handleApproChat = () => {
@@ -66,7 +66,7 @@ const NotificationDetail: React.FC<NotificationDetailInterface> = ({
                                     <div className="notification-detail-area-content-item-top-action" onClick={() => {
                                         handleApproChat();
                                     }}>
-                                        {notification.isChat  ? 'Bạn hãy trả lời khách hàng.' : 'Bạn hãy kiểm tra đơn hàng.'}
+                                        {notification.isChat ? 'Bạn hãy trả lời khách hàng.' : 'Bạn hãy kiểm tra đơn hàng.'}
                                     </div>
                                 </div>
                                 <div className="notification-detail-area-content-item-bottom">

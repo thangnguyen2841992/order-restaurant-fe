@@ -1131,8 +1131,8 @@ textarea {
     position: fixed;
     right: 30px;
     bottom: 20px;
-    width: 250px;
-    height: 380px;
+    width: 300px;
+    height: 400px;
     border: 1px solid #007bff;
     border-radius: 5px;
     background-color: white;
@@ -1269,4 +1269,18 @@ textarea {
 
 .list-chat-box-item-toUser {
     margin-right: auto; /* Đẩy phần tử này sang bên trái */
+}
+.more-display-chat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #007bff;
+    cursor: pointer;
+}
+.more-display-chat:hover {
+    text-decoration: underline;
+}
+.blink {
+    background-color: orange; /* Màu cam */
+    animation: blink-animation 1s steps(5, start) infinite;
 }
