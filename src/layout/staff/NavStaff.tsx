@@ -14,6 +14,7 @@ interface NavStaffInterface {
     setShowOrderList: (value: boolean) => void
     setType: (value: string) => void
     setShowNotificationArea: (value: boolean) => void;
+    setShowStatistic: (value: boolean) => void;
     showNotificationArea: boolean;
     totalNotification: number;
     setReloadChat: (value: boolean) => void;
@@ -27,7 +28,7 @@ const NavStaff: React.FC<NavStaffInterface> = ({
                                                    setShowOrderList,
                                                    setShowNotificationArea,
                                                    showNotificationArea,
-                                                   setReloadChat
+                                                   setShowStatistic
                                                }) => {
     const navigate = useNavigate();
     const [brands, setBrands] = useState<Brand[]>([]);
@@ -86,8 +87,11 @@ const NavStaff: React.FC<NavStaffInterface> = ({
                 <div onClick={() => changeMenu('user')} className="nav-staff-item">
                     顧客リスト
                 </div>
-                <div onClick={() => setShowOrderList(true)} className="nav-staff-item">
+                <div onClick={() => {setShowOrderList(true); setShowStatistic(false)}} className="nav-staff-item">
                     Quản lý đơn hàng
+                </div>
+                <div onClick={() => setShowStatistic(true)} className="nav-staff-item">
+                    Thống kê
                 </div>
             </div>
             <div className="nav-staff-right">

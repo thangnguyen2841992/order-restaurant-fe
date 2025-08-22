@@ -3,6 +3,7 @@ import Product from "../model/Product";
 import Notification from "../model/Notification";
 import WaitingChatResponse from "../model/WaitingChatResponse";
 import ChatRoomResponse from "../model/ChatRoomResponse";
+import TotalQuantityProductResponse from "../model/TotalQuantityProductResponse";
 
 export async function getAllProducts(): Promise<Product[]> {
     let url: string = `http://localhost:8083/staff-api/getAllProducts`;
@@ -156,4 +157,46 @@ export async function getAllChatRoomOfStaffId(): Promise<ChatRoomResponse[]> {
     return chatResponses;
 }
 
+export async function findListTotalProductOfMonth(month: number): Promise<TotalQuantityProductResponse[]> {
+    let url: string = `http://localhost:8083/staff-api/findListTotalProductOfMonth?month=${month}`;
+
+    const responseData = await myRequestToken(url);
+
+    let totalProductOrders: TotalQuantityProductResponse[] = [];
+
+    for (const key in responseData) {
+        totalProductOrders.push(
+            {
+                productId: responseData[key].productId,
+                productPrice: responseData[key].productPrice,
+                productName: responseData[key].productName,
+                productUnitName: responseData[key].productUnitName,
+                brandName: responseData[key].brandName,
+                totalQuantity: responseData[key].totalQuantity,
+            }
+        );
+    }
+
+    return totalProductOrders;
+}
+
+
+export async function getAllTotalPriceOfYear(): Promise<TotalQuantityProductResponse[]> {
+    let url: string = `http://localhost:8083/staff-api/getAllTotalPriceOfYear`;
+
+    const responseData = await myRequestToken(url);
+
+    let totalProductOrders: TotalQuantityProductResponse[] = [];
+
+    for (const key in responseData) {
+        totalProductOrders.push(
+            {
+                month: responseData[key].month,
+                totalPrice: responseData[key].totalPrice,
+            }
+        );
+    }
+
+    return totalProductOrders;
+}
 

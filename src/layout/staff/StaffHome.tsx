@@ -16,6 +16,7 @@ import {getUserToken} from "../../api/Public-Api";
 import SockJS from "sockjs-client";
 import NotificationDetail from "../user/NotificationDetail";
 import ChatStaff from "./ChatStaff";
+import Statistic from "./Statistic";
 
 
 function StaffHome() {
@@ -47,9 +48,10 @@ function StaffHome() {
     const [reloadChat, setReloadChat] = useState(false);
     const [reloadChatPopUp, setReloadChatPopUp] = useState(false);
     const [reloadNotification, setReloadNotification] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
+    const  [isVisible, setIsVisible] =useState<number[]>([]);
     const audioMessager = new Audio('/messager.mp3');
     const [showChatPopUp, setShowChatPopUp] = useState(false);
+    const [showStatistic, setShowStatistic] = useState(false);
 
 
     const handleUploadExcel = () => {
@@ -144,14 +146,15 @@ function StaffHome() {
                         });
                         setReloadChatPopUp(true);
                         setReloadChat(true);
-                        setIsVisible(true);
                         setShowChat(true);
                         setShowChatPopUp(true);
                         setChatRoomId(Number(response.chatRoomId));
-
+                    }
+                    if (response.toUserId === getUserToken().userId) {
+                        isVisible.push(response.chatRoomId ? response.chatRoomId : 0)
                         // Tắt nhấp nháy sau 1 giây
                         setTimeout(() => {
-                            setIsVisible(false);
+                            setIsVisible([]);
                         }, 5000); // Thời gian hiển thị 1 giây
                     }
                 });
@@ -317,7 +320,7 @@ function StaffHome() {
     return (
         <div className={'staff-home-area'}>
             <div>
-                <NavStaff setReloadChat={setReloadChat} showNotificationArea={showNotificationArea}
+                <NavStaff setShowStatistic={setShowStatistic} setReloadChat={setReloadChat} showNotificationArea={showNotificationArea}
                           setType={setTypeNotification} totalNotification={totalNotification}
                           handleChangeMenuStaff={handleChangeMenuStaff}
                           handleChangeBrandIdSelect={handleChangeBrandIdSelect}
@@ -328,7 +331,7 @@ function StaffHome() {
             }} className="staff-home-content">
                 <div className="staff-home-left"></div>
                 <div className="staff-home-middle">
-                    <div hidden={menuStaff !== 'listProduct' || showOrderList} className="staff-home-middle-list">
+                    <div hidden={menuStaff !== 'listProduct' || showOrderList || showStatistic} className="staff-home-middle-list">
                         <div className="staff-home-middle-header">
                             <h3>製品リスト</h3>
                             <div className={'staff-home-middle-header-btn'}>
@@ -489,8 +492,11 @@ function StaffHome() {
                         </table>
 
                     </div>
-                    <div hidden={!showOrderList}>
+                    <div hidden={!showOrderList && showStatistic}>
                         <OrderListMgmt/>
+                    </div>
+                    <div hidden={!showStatistic || showOrderList }>
+                        <Statistic/>
                     </div>
 
                 </div>

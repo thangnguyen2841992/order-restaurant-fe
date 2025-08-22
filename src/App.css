@@ -1284,3 +1284,22 @@ textarea {
     background-color: orange; /* Màu cam */
     animation: blink-animation 1s steps(5, start) infinite;
 }
+.statistic-area {
+    height: 100%;
+    width: 100%;
+}
+.statistic-area-header {
+    background-color: white;
+    height: 50px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+}
+.statistic-area-item {
+    margin-left: 20px;
+    cursor: pointer;
+    color: #007bff;
+}
+.statistic-area-content {
+    margin-top: 20px;
+}

@@ -20,7 +20,7 @@ interface ChatStaffInterface {
     setReloadChatRoom: (showChatStaff: boolean) => void;
     setReloadChat: (showChatStaff: boolean) => void;
     client: Client;
-    isVisible: boolean;
+    isVisible: number[];
     chatRoomId: number;
 
 }
@@ -182,9 +182,9 @@ const ChatStaff: React.FC<ChatStaffInterface> = ({
                     {
                         chatRooms && chatRooms.length > 0 && chatRooms.map((chatResponse: ChatRoomResponse, index: number) => (
                             <div style={{
-                                backgroundColor: isVisible ? 'orange' : 'transparent',
+                                backgroundColor: isVisible.includes(Number(chatResponse.chatRoomId))  ? 'orange' : 'transparent',
                                 transition: 'background-color 0.5s ease',
-                            }} className={`chat-staff-list-waiting-chat-content-item ${isVisible ? 'blink' : ''}`}>
+                            }} className={`chat-staff-list-waiting-chat-content-item  ${isVisible.includes(Number(chatResponse.chatRoomId))   ? 'blink' : ''}`}>
                                 <div className="chat-staff-list-waiting-chat-content-process-item">
                                     {index + 1}
                                 </div>
